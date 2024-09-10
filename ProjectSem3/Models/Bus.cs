@@ -17,6 +17,8 @@ public partial class Bus
 
     public decimal BasePrice { get; set; }
 
+    public byte? Status { get; set; }
+
     public virtual BusType? BusType { get; set; }
 
     public virtual ICollection<BusesSeat> BusesSeats { get; set; } = new List<BusesSeat>();

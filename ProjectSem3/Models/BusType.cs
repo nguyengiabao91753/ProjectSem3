@@ -9,5 +9,7 @@ public partial class BusType
 
     public string Name { get; set; } = null!;
 
+    public byte? Status { get; set; }
+
     public virtual ICollection<Bus> Buses { get; set; } = new List<Bus>();
 }
