@@ -10,6 +10,6 @@ public interface AgeGroupService
 
     public bool Update(AgeGroupDTO ageGroupDTO);
 
-    public bool Delete(AgeGroupDTO ageGroupDTO);
+    public bool Delete(int id);
     
 }

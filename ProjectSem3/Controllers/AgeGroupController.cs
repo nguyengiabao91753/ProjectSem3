@@ -41,6 +41,31 @@ public class AgeGroupController : Controller
 
     [Consumes("application/json")]
     [Produces("application/json")]
+    [HttpPost("update")]
+    public IActionResult Update([FromBody] AgeGroupDTO ageGroupDTO)
+    {
+        try
+        {
+            bool result = ageGroupService.Update(ageGroupDTO);
+
+            return Ok(new
+            {
+                status = result
+            }
+            );
+
+
+
+            throw new Exception();
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(ex.Message);
+        }
+    }
+
+    [Consumes("application/json")]
+    [Produces("application/json")]
     [HttpGet("getall")]
     public IActionResult GetAll()
     {
@@ -49,6 +74,31 @@ public class AgeGroupController : Controller
             var result = ageGroupService.GetAll();
 
             return Ok(result);
+
+
+
+            throw new Exception();
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(ex.Message);
+        }
+    }
+
+    [Consumes("application/json")]
+    [Produces("application/json")]
+    [HttpPost("delete")]
+    public IActionResult Delete(int id)
+    {
+        try
+        {
+            var result = ageGroupService.Delete(id);
+
+            return Ok(new
+            {
+                status = result
+            }
+             );
 
 
 
