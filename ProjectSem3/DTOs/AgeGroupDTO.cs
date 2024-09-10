@@ -7,4 +7,6 @@ public class AgeGroupDTO
     public string Name { get; set; }
 
     public string Discount { get; set; }
+
+    public byte Status { get; set; }
 }

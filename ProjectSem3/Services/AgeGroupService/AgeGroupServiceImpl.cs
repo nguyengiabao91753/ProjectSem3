@@ -29,9 +29,12 @@ public class AgeGroupServiceImpl : AgeGroupService
         }
     }
 
-    public bool Delete(AgeGroupDTO ageGroupDTO)
+    public bool Delete(int id)
     {
-        throw new NotImplementedException();
+        var age = db.AgeGroups.SingleOrDefault(a=>a.AgeGroupId==id);
+        age.Status = 0;
+        var agedto = mapper.Map<AgeGroupDTO>(age);
+        return Update(agedto);
     }
 
     public List<AgeGroupDTO> GetAll()
