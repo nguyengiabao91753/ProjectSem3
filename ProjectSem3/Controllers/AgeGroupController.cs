@@ -29,8 +29,6 @@ public class AgeGroupController : Controller
             }
             );
 
-
-
             throw new Exception();
         }
         catch (Exception ex)
@@ -84,6 +82,8 @@ public class AgeGroupController : Controller
             return BadRequest(ex.Message);
         }
     }
+
+
 
     [Consumes("application/json")]
     [Produces("application/json")]
