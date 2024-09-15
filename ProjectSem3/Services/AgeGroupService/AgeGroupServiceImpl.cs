@@ -39,7 +39,7 @@ public class AgeGroupServiceImpl : AgeGroupService
 
     public List<AgeGroupDTO> GetAll()
     {
-        return mapper.Map<List<AgeGroupDTO>>( db.AgeGroups.ToList() );
+        return mapper.Map<List<AgeGroupDTO>>( db.AgeGroups.ToList());
     }
 
     public bool Update(AgeGroupDTO ageGroupDTO)

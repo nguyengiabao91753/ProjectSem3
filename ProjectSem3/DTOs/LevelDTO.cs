@@ -1,12 +1,11 @@
 ﻿namespace ProjectSem3.DTOs;
 
-public class AgeGroupDTO
+public class LevelDTO
 {
-    public int AgeGroupId { get; set; }
+    public int LevelId { get; set; }
 
     public string? Name { get; set; }
 
-    public string? Discount { get; set; }
-
     public byte? Status { get; set; }
+
 }

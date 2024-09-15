@@ -1,7 +1,10 @@
 using Microsoft.EntityFrameworkCore;
 using ProjectSem3.DTOs;
 using ProjectSem3.Models;
+using ProjectSem3.Services.AccountService;
 using ProjectSem3.Services.AgeGroupService;
+using ProjectSem3.Services.LevelService;
+using ProjectSem3.Services.UserService;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -23,6 +26,11 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 builder.Services.AddScoped<AgeGroupService, AgeGroupServiceImpl>();
+builder.Services.AddScoped<LevelService,LevelServiceImpl>();
+builder.Services.AddScoped<UserService, UserServiceImpl>();
+builder.Services.AddScoped<AccountUserService, AccountUserServiceImpl>();
+
+
 
 
 var app = builder.Build();
