@@ -1,50 +1,27 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using ProjectSem3.DTOs;
-using ProjectSem3.Services.AgeGroupService;
+using ProjectSem3.Services.LocationService;
 
 namespace ProjectSem3.Controllers;
-[Route("api/agegroup")]
+[Route("api/location")]
 [ApiController]
-public class AgeGroupController : Controller
+public class LocationController : Controller
 {
-    private AgeGroupService ageGroupService;
+    private LocationService locationService;
 
-    public AgeGroupController(AgeGroupService ageGroupService)
+    public LocationController(LocationService locationService)
     {
-        this.ageGroupService = ageGroupService;
+        this.locationService = locationService;
     }
 
     [Consumes("application/json")]
     [Produces("application/json")]
     [HttpPost("create")]
-    public IActionResult Create([FromBody] AgeGroupDTO ageGroupDTO)
+    public IActionResult Create([FromBody] LocationDTO locationDTO)
     {
         try
         {
-            bool result = ageGroupService.Create(ageGroupDTO);
-
-            return Ok(new
-            {
-                status = result
-            }
-            );
-
-            throw new Exception();
-        }
-        catch (Exception ex)
-        {
-            return BadRequest(ex.Message);
-        }
-    }
-
-    [Consumes("application/json")]
-    [Produces("application/json")]
-    [HttpPost("update")]
-    public IActionResult Update([FromBody] AgeGroupDTO ageGroupDTO)
-    {
-        try
-        {
-            bool result = ageGroupService.Update(ageGroupDTO);
+            bool result = locationService.Create(locationDTO);
 
             return Ok(new
             {
@@ -69,7 +46,7 @@ public class AgeGroupController : Controller
     {
         try
         {
-            var result = ageGroupService.GetAll();
+            var result = locationService.GetAll();
 
             return Ok(result);
 
@@ -83,8 +60,6 @@ public class AgeGroupController : Controller
         }
     }
 
-
-
     [Consumes("application/json")]
     [Produces("application/json")]
     [HttpPost("delete")]
@@ -92,13 +67,39 @@ public class AgeGroupController : Controller
     {
         try
         {
-            var result = ageGroupService.Delete(id);
+            var result = locationService.Delete(id);
 
             return Ok(new
             {
                 status = result
             }
              );
+
+
+
+            throw new Exception();
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(ex.Message);
+        }
+    }
+
+
+    [Consumes("application/json")]
+    [Produces("application/json")]
+    [HttpPost("update")]
+    public IActionResult Update([FromBody] LocationDTO locationDTO)
+    {
+        try
+        {
+            bool result = locationService.Update(locationDTO);
+
+            return Ok(new
+            {
+                status = result
+            }
+            );
 
 
 

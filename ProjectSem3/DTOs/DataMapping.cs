@@ -34,13 +34,46 @@ public class DataMapping : Profile
            s => s.MapFrom(b => DateTime.ParseExact(b.BookingDate, "HH:mm:ss dd/MM/yyyy", CultureInfo.InvariantCulture))
            );
         //Phần anh Duy
+        CreateMap<BusType, BusTypeDTO>().ReverseMap();
 
+        CreateMap<Bus, BusDTO>()
+        .ForMember(
+            d => d.BusName,
+            o => o.MapFrom(s => s.BusType.Name)
+        );
+        CreateMap<BusDTO, Bus>();
 
+        CreateMap<BusesSeat, BusesSeatDTO>()
+        .ForMember(
+            d => d.BusLicensePlate,
+            o => o.MapFrom(s => s.Bus.LicensePlate)
+        );
+        CreateMap<BusesSeatDTO, BusesSeat>();
 
         //Phần anh Hải
 
 
 
         //Phần anh Ý
+
+        //Bang location
+        CreateMap<Location, LocationDTO>();
+        CreateMap<LocationDTO, Location>();
+        // Bang trip
+        CreateMap<Trip, TripDTO>().ForMember(
+            d => d.DateStart,
+            s => s.MapFrom(s => s.DateStart.ToString("HH:mm:ss dd/MM/yyyy "))
+            ).ForMember(
+            d => d.DateEnd,
+            s => s.MapFrom(s => s.DateEnd.ToString("HH:mm:ss dd/MM/yyyy "))
+            );
+        CreateMap<TripDTO, Trip>().ForMember(
+            d => d.DateStart,
+            s => s.MapFrom(b => DateTime.ParseExact(b.DateStart, "HH:mm:ss dd/MM/yyyy", CultureInfo.InvariantCulture))
+            ).ForMember(
+            d => d.DateEnd,
+            s => s.MapFrom(b => DateTime.ParseExact(b.DateEnd, "HH:mm:ss dd/MM/yyyy", CultureInfo.InvariantCulture))
+            );
+
     }
 }

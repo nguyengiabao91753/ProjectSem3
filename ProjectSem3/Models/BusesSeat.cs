@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace ProjectSem3.Models;
+﻿namespace ProjectSem3.Models;
 
 public partial class BusesSeat
 {

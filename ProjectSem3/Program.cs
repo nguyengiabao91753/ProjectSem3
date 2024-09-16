@@ -5,6 +5,12 @@ using ProjectSem3.DTOs;
 using ProjectSem3.Hubs;
 using ProjectSem3.Models;
 using ProjectSem3.Services.AgeGroupService;
+using ProjectSem3.Services.LocationService;
+using ProjectSem3.Services.TripService;
+
+using ProjectSem3.Services.BusesSeatService;
+using ProjectSem3.Services.BusService;
+using ProjectSem3.Services.BusTypeService;
 using ProjectSem3.Services.PolicyService;
 using System.Text;
 
@@ -42,7 +48,7 @@ builder.Services.AddAuthentication(option =>
 
 
 builder.Services.AddAutoMapper(typeof(DataMapping));
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+/*// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle*/
 var connectionString = builder.Configuration["ConnectionStrings:DefaultConnection"].ToString();
 
 builder.Services.AddDbContext<DatabaseContext>(option => option.UseLazyLoadingProxies().UseSqlServer(connectionString));
@@ -50,8 +56,18 @@ builder.Services.AddDbContext<DatabaseContext>(option => option.UseLazyLoadingPr
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+
 builder.Services.AddScoped<AgeGroupService, AgeGroupServiceImpl>();
+builder.Services.AddScoped<TripService, TripServiceImpl>();
+builder.Services.AddScoped<LocationService, LocationServiceImpl>();
+
+
+builder.Services.AddScoped<BusTypeService, BusTypeServiceImpl>();
+builder.Services.AddScoped<BusService, BusServiceImpl>();
+builder.Services.AddScoped<BusesSeatService, BusesSeatServiceImpl>();
+
 builder.Services.AddScoped<PolicyService, PolicyServiceImpl>();
+
 
 
 var app = builder.Build();
