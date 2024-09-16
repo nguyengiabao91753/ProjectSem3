@@ -2,12 +2,15 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using ProjectSem3.DTOs;
+using ProjectSem3.Hubs;
 using ProjectSem3.Models;
 using ProjectSem3.Services.AgeGroupService;
 using ProjectSem3.Services.PolicyService;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddSignalR();
 
 // Add services to the container.
 
@@ -52,6 +55,7 @@ builder.Services.AddScoped<PolicyService, PolicyServiceImpl>();
 
 
 var app = builder.Build();
+
 app.UseCors(builder => builder
                 .AllowAnyHeader()
                 .AllowAnyMethod()
@@ -73,6 +77,9 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+// Cấu hình endpoint cho SignalR
+app.MapHub<SeatHub>("/seatHub");
 
 app.UseHttpsRedirection();
 
