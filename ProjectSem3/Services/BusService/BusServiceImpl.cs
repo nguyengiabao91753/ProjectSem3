@@ -20,6 +20,16 @@ public class BusServiceImpl : BusService
         try
         {
             var bus = mapper.Map<Bus>(busDTO);
+            var busType = db.BusTypes.FirstOrDefault(b => b.Name == busDTO.BusName);
+            if (busType != null)
+            {
+                if (busDTO.BusTypeId != null && busDTO.BusTypeId != busType.BusTypeId)
+                {
+                    throw new InvalidOperationException("BusTypeId does not match the BusName provided.");
+                }
+
+                bus.BusTypeId = busType.BusTypeId;
+            }
             db.Buses.Add(bus);
             return db.SaveChanges() > 0;
         }
@@ -42,6 +52,11 @@ public class BusServiceImpl : BusService
         return Update(busDTO);
     }
 
+    public BusDTO findById(int id)
+    {
+        return mapper.Map<BusDTO>(db.Buses.Find(id));
+    }
+
     public List<BusDTO> GetAll()
     {
         return mapper.Map<List<BusDTO>>(db.Buses.ToList());
@@ -52,6 +67,16 @@ public class BusServiceImpl : BusService
         try
         {
             var bus = mapper.Map<Bus>(busDTO);
+            var busType = db.BusTypes.FirstOrDefault(b => b.Name == busDTO.BusName);
+            if (busType != null)
+            {
+                if (busDTO.BusTypeId != null && busDTO.BusTypeId != busType.BusTypeId)
+                {
+                    throw new InvalidOperationException("BusTypeId does not match the BusName provided.");
+                }
+
+                bus.BusTypeId = busType.BusTypeId;
+            }
             db.Entry(bus).State = Microsoft.EntityFrameworkCore.EntityState.Modified;
             return db.SaveChanges() > 0;
         }

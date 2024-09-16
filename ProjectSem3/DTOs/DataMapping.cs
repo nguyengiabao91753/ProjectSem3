@@ -14,17 +14,20 @@ public class DataMapping : Profile
 
         //Phần anh Duy
         CreateMap<BusType, BusTypeDTO>().ReverseMap();
+
         CreateMap<Bus, BusDTO>()
         .ForMember(
             d => d.BusName,
             o => o.MapFrom(s => s.BusType.Name)
         );
+        CreateMap<BusDTO, Bus>();
 
-        CreateMap<BusDTO, Bus>()
+        CreateMap<BusesSeat, BusesSeatDTO>()
         .ForMember(
-            d => d.BusType,
-            o => o.Ignore()
+            d => d.BusLicensePlate,
+            o => o.MapFrom(s => s.Bus.LicensePlate)
         );
+        CreateMap<BusesSeatDTO, BusesSeat>();
 
         //Phần anh Hải
 

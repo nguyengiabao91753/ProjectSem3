@@ -1,25 +1,25 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using ProjectSem3.DTOs;
-using ProjectSem3.Services.BusService;
+using ProjectSem3.Services.BusesSeatService;
 
 namespace ProjectSem3.Controllers;
 [Route("api/[controller]")]
 [ApiController]
-public class BusController : ControllerBase
+public class BusesSeatController : ControllerBase
 {
-    private readonly BusService busService;
+    private readonly BusesSeatService busesSeatService;
 
-    public BusController(BusService _busService)
+    public BusesSeatController(BusesSeatService _busesSeatService)
     {
-        busService = _busService;
+        busesSeatService = _busesSeatService;
     }
 
-    [HttpGet("get-all-bus")]
+    [HttpGet("get-all-buses-seat")]
     public IActionResult GetAll()
     {
         try
         {
-            var result = busService.GetAll();
+            var result = busesSeatService.GetAll();
             return Ok(result);
         }
         catch (Exception ex)
@@ -29,12 +29,12 @@ public class BusController : ControllerBase
     }
 
     [Produces("application/json")]
-    [HttpGet("find-by-id/{id}")]
-    public IActionResult FindById(int id)
+    [HttpGet("find-seats-by-busId/{busId}")]
+    public IActionResult FindSeatsByBusId(int busId)
     {
         try
         {
-            var result = busService.findById(id);
+            var result = busesSeatService.GetSeatsByBusId(busId);
             return Ok(result);
         }
         catch (Exception ex)
@@ -45,12 +45,12 @@ public class BusController : ControllerBase
 
     [Consumes("application/json")]
     [Produces("application/json")]
-    [HttpPost("create-bus")]
-    public IActionResult Create([FromBody] BusDTO busDTO)
+    [HttpPost("create-buses-seat")]
+    public IActionResult Create([FromBody] BusesSeatDTO busesSeatDTO)
     {
         try
         {
-            bool result = busService.Create(busDTO);
+            bool result = busesSeatService.Create(busesSeatDTO);
             return Ok(new
             {
                 status = result
@@ -64,12 +64,12 @@ public class BusController : ControllerBase
 
     [Consumes("application/json")]
     [Produces("application/json")]
-    [HttpPost("update-bus")]
-    public IActionResult Update([FromBody] BusDTO busDTO)
+    [HttpPut("update-buses-seat")]
+    public IActionResult Update([FromBody] BusesSeatDTO busesSeatDTO)
     {
         try
         {
-            bool result = busService.Update(busDTO);
+            bool result = busesSeatService.Update(busesSeatDTO);
             return Ok(new
             {
                 status = result
@@ -83,17 +83,13 @@ public class BusController : ControllerBase
 
     [Consumes("application/json")]
     [Produces("application/json")]
-    [HttpPost("disable-bus")]
+    [HttpPost("disable-buses-seat")]
     public IActionResult Disable(int id)
     {
         try
         {
-            var result = busService.Disable(id);
-
-            return Ok(new
-            {
-                status = result
-            });
+            bool result = busesSeatService.Disable(id);
+            return Ok(result);
         }
         catch (Exception ex)
         {

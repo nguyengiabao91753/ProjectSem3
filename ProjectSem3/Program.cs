@@ -2,7 +2,9 @@ using Microsoft.EntityFrameworkCore;
 using ProjectSem3.DTOs;
 using ProjectSem3.Models;
 using ProjectSem3.Services.AgeGroupService;
-using ProjectSem3.Services.BusTypesService;
+using ProjectSem3.Services.BusesSeatService;
+using ProjectSem3.Services.BusService;
+using ProjectSem3.Services.BusTypeService;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -24,7 +26,9 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 builder.Services.AddScoped<AgeGroupService, AgeGroupServiceImpl>();
-builder.Services.AddScoped<BusTypesService, BusTypesServiceImpl>();
+builder.Services.AddScoped<BusTypeService, BusTypeServiceImpl>();
+builder.Services.AddScoped<BusService, BusServiceImpl>();
+builder.Services.AddScoped<BusesSeatService, BusesSeatServiceImpl>();
 
 
 var app = builder.Build();

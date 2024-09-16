@@ -14,7 +14,7 @@ public class BusTypeController : ControllerBase
         busTypeService = _busTypeService;
     }
 
-    [HttpGet("get-all-bustype")]
+    [HttpGet("get-all-bus-type")]
     public IActionResult GetAll()
     {
         try
@@ -30,7 +30,7 @@ public class BusTypeController : ControllerBase
 
     [Consumes("application/json")]
     [Produces("application/json")]
-    [HttpPost("create-bustype")]
+    [HttpPost("create-bus-type")]
     public IActionResult Create([FromBody] BusTypeDTO busTypeDTO)
     {
         try
@@ -51,7 +51,7 @@ public class BusTypeController : ControllerBase
 
     [Consumes("application/json")]
     [Produces("application/json")]
-    [HttpPut("update-bustype")]
+    [HttpPost("update-bus-type")]
     public IActionResult Update([FromBody] BusTypeDTO busTypeDTO)
     {
         try
@@ -71,7 +71,7 @@ public class BusTypeController : ControllerBase
 
     [Consumes("application/json")]
     [Produces("application/json")]
-    [HttpPost("disable-bustype")]
+    [HttpPost("disable-bus-type")]
     public IActionResult Disable(int id)
     {
         try
@@ -88,4 +88,5 @@ public class BusTypeController : ControllerBase
             return BadRequest(ex.Message);
         }
     }
+
 }
