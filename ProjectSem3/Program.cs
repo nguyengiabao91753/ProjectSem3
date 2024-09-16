@@ -2,6 +2,8 @@ using Microsoft.EntityFrameworkCore;
 using ProjectSem3.DTOs;
 using ProjectSem3.Models;
 using ProjectSem3.Services.AgeGroupService;
+using ProjectSem3.Services.LocationService;
+using ProjectSem3.Services.TripService;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -14,7 +16,7 @@ builder.Services.AddCors(); //cho phép bên ngoài gọi API
 
 
 builder.Services.AddAutoMapper(typeof(DataMapping));
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+/*// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle*/
 var connectionString = builder.Configuration["ConnectionStrings:DefaultConnection"].ToString();
 
 builder.Services.AddDbContext<DatabaseContext>(option => option.UseLazyLoadingProxies().UseSqlServer(connectionString));
@@ -22,7 +24,11 @@ builder.Services.AddDbContext<DatabaseContext>(option => option.UseLazyLoadingPr
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+
 builder.Services.AddScoped<AgeGroupService, AgeGroupServiceImpl>();
+builder.Services.AddScoped<TripService, TripServiceImpl>();
+builder.Services.AddScoped<LocationService, LocationServiceImpl>();
+
 
 
 var app = builder.Build();
