@@ -48,14 +48,17 @@ public partial class DatabaseContext : DbContext
     {
         modelBuilder.Entity<Account>(entity =>
         {
-            entity.HasKey(e => e.AccountId).HasName("PK__Accounts__349DA586459CDD34");
+            entity.HasKey(e => e.AccountId).HasName("PK__Accounts__349DA5861664C857");
 
             entity.Property(e => e.AccountId)
-                .ValueGeneratedOnAdd()
+                .ValueGeneratedNever()
                 .HasColumnName("AccountID");
             entity.Property(e => e.LevelId).HasColumnName("LevelID");
             entity.Property(e => e.Password).HasMaxLength(255);
             entity.Property(e => e.Status).HasDefaultValue((byte)1);
+            entity.Property(e => e.Username)
+                .HasMaxLength(50)
+                .IsUnicode(false);
 
             entity.HasOne(d => d.AccountNavigation).WithOne(p => p.Account)
                 .HasForeignKey<Account>(d => d.AccountId)
@@ -69,7 +72,7 @@ public partial class DatabaseContext : DbContext
 
         modelBuilder.Entity<AgeGroup>(entity =>
         {
-            entity.HasKey(e => e.AgeGroupId).HasName("PK__AgeGroup__5B9B0B756531FE14");
+            entity.HasKey(e => e.AgeGroupId).HasName("PK__AgeGroup__5B9B0B75335DED11");
 
             entity.Property(e => e.AgeGroupId).HasColumnName("AgeGroupID");
             entity.Property(e => e.Discount)
@@ -81,9 +84,9 @@ public partial class DatabaseContext : DbContext
 
         modelBuilder.Entity<Booking>(entity =>
         {
-            entity.HasKey(e => e.BookingId).HasName("PK__Bookings__73951ACDE13B6702");
+            entity.HasKey(e => e.BookingId).HasName("PK__Bookings__73951ACD08F356D4");
 
-            entity.HasIndex(e => e.TicketCode, "UQ__Bookings__598CF7A383E52A74").IsUnique();
+            entity.HasIndex(e => e.TicketCode, "UQ__Bookings__598CF7A36A0C1195").IsUnique();
 
             entity.Property(e => e.BookingId).HasColumnName("BookingID");
             entity.Property(e => e.Address).HasMaxLength(200);
@@ -114,7 +117,7 @@ public partial class DatabaseContext : DbContext
 
         modelBuilder.Entity<Bus>(entity =>
         {
-            entity.HasKey(e => e.BusId).HasName("PK__Buses__6A0F60955A389DB8");
+            entity.HasKey(e => e.BusId).HasName("PK__Buses__6A0F6095EA63B6EC");
 
             entity.Property(e => e.BusId).HasColumnName("BusID");
             entity.Property(e => e.AirConditioned).HasDefaultValue((byte)0);
@@ -130,7 +133,7 @@ public partial class DatabaseContext : DbContext
 
         modelBuilder.Entity<BusType>(entity =>
         {
-            entity.HasKey(e => e.BusTypeId).HasName("PK__BusTypes__84A10CC8B044D471");
+            entity.HasKey(e => e.BusTypeId).HasName("PK__BusTypes__84A10CC881B7A277");
 
             entity.Property(e => e.BusTypeId).HasColumnName("BusTypeID");
             entity.Property(e => e.Name).HasMaxLength(50);
@@ -139,7 +142,7 @@ public partial class DatabaseContext : DbContext
 
         modelBuilder.Entity<BusesSeat>(entity =>
         {
-            entity.HasKey(e => e.SeatId).HasName("PK__Buses_Se__311713D3E2343E89");
+            entity.HasKey(e => e.SeatId).HasName("PK__Buses_Se__311713D3D3F85F6F");
 
             entity.ToTable("Buses_Seats");
 
@@ -155,7 +158,7 @@ public partial class DatabaseContext : DbContext
 
         modelBuilder.Entity<BusesTrip>(entity =>
         {
-            entity.HasKey(e => e.BusTripId).HasName("PK__BusesTri__14ADEEEDBEDFC35F");
+            entity.HasKey(e => e.BusTripId).HasName("PK__BusesTri__14ADEEEDC258F61D");
 
             entity.Property(e => e.BusTripId).HasColumnName("BusTripID");
             entity.Property(e => e.BusId).HasColumnName("BusID");
@@ -174,7 +177,7 @@ public partial class DatabaseContext : DbContext
 
         modelBuilder.Entity<CustomerFeedback>(entity =>
         {
-            entity.HasKey(e => e.FeedbackId).HasName("PK__Customer__6A4BEDF632949F12");
+            entity.HasKey(e => e.FeedbackId).HasName("PK__Customer__6A4BEDF6145C34BD");
 
             entity.ToTable("CustomerFeedback");
 
@@ -195,7 +198,7 @@ public partial class DatabaseContext : DbContext
 
         modelBuilder.Entity<Level>(entity =>
         {
-            entity.HasKey(e => e.LevelId).HasName("PK__Levels__09F03C0632759436");
+            entity.HasKey(e => e.LevelId).HasName("PK__Levels__09F03C0653D98E81");
 
             entity.Property(e => e.LevelId).HasColumnName("LevelID");
             entity.Property(e => e.Name).HasMaxLength(100);
@@ -204,7 +207,7 @@ public partial class DatabaseContext : DbContext
 
         modelBuilder.Entity<Location>(entity =>
         {
-            entity.HasKey(e => e.LocationId).HasName("PK__Location__E7FEA47732F53FCB");
+            entity.HasKey(e => e.LocationId).HasName("PK__Location__E7FEA477ED535BCD");
 
             entity.Property(e => e.LocationId).HasColumnName("LocationID");
             entity.Property(e => e.Name).HasMaxLength(100);
@@ -212,7 +215,7 @@ public partial class DatabaseContext : DbContext
 
         modelBuilder.Entity<Payment>(entity =>
         {
-            entity.HasKey(e => e.PaymentId).HasName("PK__Payments__9B556A5852CF210A");
+            entity.HasKey(e => e.PaymentId).HasName("PK__Payments__9B556A5891004621");
 
             entity.Property(e => e.PaymentId).HasColumnName("PaymentID");
             entity.Property(e => e.Amount).HasColumnType("decimal(18, 2)");
@@ -227,7 +230,7 @@ public partial class DatabaseContext : DbContext
 
         modelBuilder.Entity<Policy>(entity =>
         {
-            entity.HasKey(e => e.PolicyId).HasName("PK__Policies__2E133944A05EB817");
+            entity.HasKey(e => e.PolicyId).HasName("PK__Policies__2E133944CCB3983A");
 
             entity.Property(e => e.PolicyId).HasColumnName("PolicyID");
             entity.Property(e => e.Content).HasColumnType("text");
@@ -237,7 +240,7 @@ public partial class DatabaseContext : DbContext
 
         modelBuilder.Entity<Trip>(entity =>
         {
-            entity.HasKey(e => e.TripId).HasName("PK__Trips__51DC711EFB36F7D2");
+            entity.HasKey(e => e.TripId).HasName("PK__Trips__51DC711E4B66A50B");
 
             entity.Property(e => e.TripId).HasColumnName("TripID");
             entity.Property(e => e.ArrivalLocationId).HasColumnName("ArrivalLocationID");
@@ -257,7 +260,7 @@ public partial class DatabaseContext : DbContext
 
         modelBuilder.Entity<User>(entity =>
         {
-            entity.HasKey(e => e.UserId).HasName("PK__Users__1788CCACA57E2758");
+            entity.HasKey(e => e.UserId).HasName("PK__Users__1788CCACFEE889C1");
 
             entity.Property(e => e.UserId).HasColumnName("UserID");
             entity.Property(e => e.Address).HasMaxLength(200);
