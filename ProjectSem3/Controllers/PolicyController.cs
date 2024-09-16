@@ -1,33 +1,35 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using ProjectSem3.DTOs;
 using ProjectSem3.Services.AgeGroupService;
+using ProjectSem3.Services.PolicyService;
 
 namespace ProjectSem3.Controllers;
-[Route("api/agegroup")]
+[Route("api/policy")]
 [ApiController]
-public class AgeGroupController : Controller
+public class PolicyController : Controller
 {
-    private AgeGroupService ageGroupService;
-
-    public AgeGroupController(AgeGroupService ageGroupService)
+    private PolicyService policyService;
+    public PolicyController(PolicyService policyService)
     {
-        this.ageGroupService = ageGroupService;
+        this.policyService = policyService;
     }
 
     [Consumes("application/json")]
     [Produces("application/json")]
     [HttpPost("create")]
-    public IActionResult Create([FromBody] AgeGroupDTO ageGroupDTO)
+    public IActionResult Create([FromBody] PolicyDTO policyDTO)
     {
         try
         {
-            bool result = ageGroupService.Create(ageGroupDTO);
+            bool result = policyService.create(policyDTO);
 
             return Ok(new
             {
                 status = result
             }
             );
+
+
 
             throw new Exception();
         }
@@ -40,11 +42,11 @@ public class AgeGroupController : Controller
     [Consumes("application/json")]
     [Produces("application/json")]
     [HttpPost("update")]
-    public IActionResult Update([FromBody] AgeGroupDTO ageGroupDTO)
+    public IActionResult Update([FromBody] PolicyDTO policyDTO)
     {
         try
         {
-            bool result = ageGroupService.Update(ageGroupDTO);
+            bool result = policyService.update(policyDTO);
 
             return Ok(new
             {
@@ -64,41 +66,14 @@ public class AgeGroupController : Controller
 
     [Consumes("application/json")]
     [Produces("application/json")]
-    [HttpGet("getall")]
+    [HttpGet("getall")] 
     public IActionResult GetAll()
     {
         try
         {
-            var result = ageGroupService.GetAll();
+            var result = policyService.getall();
 
             return Ok(result);
-
-
-
-            throw new Exception();
-        }
-        catch (Exception ex)
-        {
-            return BadRequest(ex.Message);
-        }
-    }
-
-
-
-    [Consumes("application/json")]
-    [Produces("application/json")]
-    [HttpPost("delete")]
-    public IActionResult Delete(int id)
-    {
-        try
-        {
-            var result = ageGroupService.Delete(id);
-
-            return Ok(new
-            {
-                status = result
-            }
-             );
 
 
 
