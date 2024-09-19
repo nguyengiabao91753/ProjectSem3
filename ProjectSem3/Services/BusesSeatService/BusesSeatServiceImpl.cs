@@ -15,21 +15,11 @@ public class BusesSeatServiceImpl : BusesSeatService
         mapper = _mapper;
     }
 
-    public bool Create(BusesSeatDTO busesSeatDTO)
+    public bool Create(BusesSeat busesSeat)
     {
         try
         {
-            var busesSeat = mapper.Map<BusesSeat>(busesSeatDTO);
-            var bus = db.Buses.SingleOrDefault(b => b.LicensePlate == busesSeatDTO.BusLicensePlate);
-            if (bus != null)
-            {
-                if (busesSeatDTO.BusId != null && busesSeatDTO.BusId != bus.BusId)
-                {
-                    throw new InvalidOperationException("BusId does not match the BusLicensePlate provided.");
-                }
-
-                busesSeat.BusId = bus.BusId;
-            }
+            //var busesSeat = mapper.Map<BusesSeat>(busesSeatDTO);
             db.BusesSeats.Add(busesSeat);
             return db.SaveChanges() > 0;
         }
