@@ -21,17 +21,19 @@ public class AgeGroupServiceImpl : AgeGroupService
     {
         try
         {
-            var ageGroup = mapper.Map<AgeGroup>( ageGroupDTO);
-            db.AgeGroups.Add( ageGroup );
+            var ageGroup = mapper.Map<AgeGroup>(ageGroupDTO);
+            db.AgeGroups.Add(ageGroup);
             return db.SaveChanges() > 0;
-        }catch ( Exception ex ) { 
+        }
+        catch (Exception ex)
+        {
             return false;
         }
     }
 
     public bool Delete(int id)
     {
-        var age = db.AgeGroups.SingleOrDefault(a=>a.AgeGroupId==id);
+        var age = db.AgeGroups.SingleOrDefault(a => a.AgeGroupId == id);
         age.Status = 0;
         var agedto = mapper.Map<AgeGroupDTO>(age);
         return Update(agedto);
@@ -39,7 +41,7 @@ public class AgeGroupServiceImpl : AgeGroupService
 
     public List<AgeGroupDTO> GetAll()
     {
-        return mapper.Map<List<AgeGroupDTO>>( db.AgeGroups.ToList() );
+        return mapper.Map<List<AgeGroupDTO>>(db.AgeGroups.OrderByDescending(a=>a.AgeGroupId).ToList());
     }
 
     public bool Update(AgeGroupDTO ageGroupDTO)
@@ -49,8 +51,9 @@ public class AgeGroupServiceImpl : AgeGroupService
             var ageGroup = mapper.Map<AgeGroup>(ageGroupDTO);
             db.Entry(ageGroup).State = Microsoft.EntityFrameworkCore.EntityState.Modified;
             return db.SaveChanges() > 0;
-        }catch
-        ( Exception ex )
+        }
+        catch
+        (Exception ex)
         {
             return false;
         }

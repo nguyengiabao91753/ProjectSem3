@@ -7,4 +7,6 @@ public interface BookingService
     public bool Create(BookingDTO bookingDTO);
 
     public bool Update(BookingDTO bookingDTO);
+
+    public bool Cancel(BookingDTO bookingDTO);
 }
