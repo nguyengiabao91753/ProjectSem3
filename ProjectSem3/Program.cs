@@ -4,13 +4,12 @@ using Microsoft.IdentityModel.Tokens;
 using ProjectSem3.DTOs;
 using ProjectSem3.Models;
 using ProjectSem3.Services.AgeGroupService;
-using ProjectSem3.Services.LocationService;
-using ProjectSem3.Services.TripService;
-
 using ProjectSem3.Services.BusesSeatService;
 using ProjectSem3.Services.BusService;
 using ProjectSem3.Services.BusTypeService;
+using ProjectSem3.Services.LocationService;
 using ProjectSem3.Services.PolicyService;
+using ProjectSem3.Services.TripService;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
