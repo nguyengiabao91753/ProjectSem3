@@ -9,6 +9,8 @@ public partial class Location
 
     public string Name { get; set; } = null!;
 
+    public byte? Status { get; set; }
+
     public virtual ICollection<Trip> TripArrivalLocations { get; set; } = new List<Trip>();
 
     public virtual ICollection<Trip> TripDepartureLocations { get; set; } = new List<Trip>();

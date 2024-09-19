@@ -43,24 +43,24 @@ public class BusesSeatController : ControllerBase
         }
     }
 
-    [Consumes("application/json")]
-    [Produces("application/json")]
-    [HttpPost("create-buses-seat")]
-    public IActionResult Create([FromBody] BusesSeatDTO busesSeatDTO)
-    {
-        try
-        {
-            bool result = busesSeatService.Create(busesSeatDTO);
-            return Ok(new
-            {
-                status = result
-            });
-        }
-        catch (Exception ex)
-        {
-            return BadRequest(ex.Message);
-        }
-    }
+    //[Consumes("application/json")]
+    //[Produces("application/json")]
+    //[HttpPost("create-buses-seat")]
+    //public IActionResult Create([FromBody] BusesSeatDTO busesSeatDTO)
+    //{
+    //    try
+    //    {
+    //        bool result = busesSeatService.Create(busesSeatDTO);
+    //        return Ok(new
+    //        {
+    //            status = result
+    //        });
+    //    }
+    //    catch (Exception ex)
+    //    {
+    //        return BadRequest(ex.Message);
+    //    }
+    //}
 
     [Consumes("application/json")]
     [Produces("application/json")]

@@ -8,11 +8,15 @@ public class BusServiceImpl : BusService
 {
     private readonly DatabaseContext db;
     private readonly IMapper mapper;
-
     public BusServiceImpl(DatabaseContext _db, IMapper _mapper)
     {
         db = _db;
         mapper = _mapper;
+    }
+
+    public bool checkLicensePlateExists(string licensePlate)
+    {
+        return db.Buses.Any(b => b.LicensePlate == licensePlate);
     }
 
     public bool Create(BusDTO busDTO)
@@ -31,7 +35,18 @@ public class BusServiceImpl : BusService
                 bus.BusTypeId = busType.BusTypeId;
             }
             db.Buses.Add(bus);
-            return db.SaveChanges() > 0;
+            if (db.SaveChanges() > 0)
+            {
+                for (int i = 1; i <= bus.SeatCount; i++)
+                {
+                    BusesSeat seat = new BusesSeat();
+                    seat.BusId = bus.BusId;
+                    seat.Name = i.ToString();
+                    db.BusesSeats.Add(seat);
+                }
+                return db.SaveChanges() > 0;
+            }
+            return false;
         }
         catch (Exception ex)
         {
@@ -59,7 +74,7 @@ public class BusServiceImpl : BusService
 
     public List<BusDTO> GetAll()
     {
-        return mapper.Map<List<BusDTO>>(db.Buses.ToList());
+        return mapper.Map<List<BusDTO>>(db.Buses.OrderByDescending(b => b.BusId).ToList());
     }
 
     public bool Update(BusDTO busDTO)
