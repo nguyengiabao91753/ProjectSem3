@@ -59,6 +59,20 @@ public class LocationController : Controller
             return BadRequest(ex.Message);
         }
     }
+    [HttpGet("check-location-name-exists")]
+    public IActionResult CheckLocationName([FromQuery] string name)
+    {
+        try
+        {
+            var exist = locationService.CheckLocationNameExists(name);
+            return Ok(new { exist });
+
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(ex);
+        }
+    }
 
     [Consumes("application/json")]
     [Produces("application/json")]

@@ -54,6 +54,14 @@ public class TripController : Controller
         }
     }
 
+
+    [HttpGet("trips-with-locations")]
+    public ActionResult<List<TripDTO>> GetTripsWithLocations()
+    {
+        var trips = tripService.GetTripsWithLocationNames();
+        return Ok(trips);
+    }
+
     [Consumes("application/json")]
     [Produces("application/json")]
     [HttpPost("delete")]
