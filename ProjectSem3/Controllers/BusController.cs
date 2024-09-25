@@ -34,7 +34,13 @@ public class BusController : ControllerBase
         try
         {
             var exists = busService.checkLicensePlateExists(licensePlate);
-            return Ok(new { exists });
+            var status = exists == null ? false : true;
+            return Ok(new
+            {
+                status = status,
+                busId = exists == null ? 0 : exists.BusId
+            });
+
         }
         catch (Exception ex)
         {

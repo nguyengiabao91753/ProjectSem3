@@ -14,9 +14,9 @@ public class BusServiceImpl : BusService
         mapper = _mapper;
     }
 
-    public bool checkLicensePlateExists(string licensePlate)
+    public BusDTO checkLicensePlateExists(string licensePlate)
     {
-        return db.Buses.Any(b => b.LicensePlate == licensePlate);
+        return mapper.Map<BusDTO>(db.Buses.SingleOrDefault(b => b.LicensePlate == licensePlate));
     }
 
     public bool Create(BusDTO busDTO)

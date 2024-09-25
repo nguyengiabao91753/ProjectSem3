@@ -50,6 +50,31 @@ public class DataMapping : Profile
         );
         CreateMap<BusesSeatDTO, BusesSeat>();
 
+        CreateMap<PaymentDTO, Payment>()
+        .ForMember(d => d.PaymentDate,
+                    s => s.MapFrom(s => DateTime.ParseExact(s.PaymentDate, "HH:mm:ss dd/MM/yyyy", CultureInfo.InvariantCulture))
+        );
+        // .ForMember(
+        //    s => s.Booking.BirthDate,
+        //    s => s.MapFrom(b => DateTime.ParseExact(b.BirthDate, "HH:mm:ss dd/MM/yyyy", CultureInfo.InvariantCulture))
+        // );
+        CreateMap<Payment, PaymentDTO>()
+        .ForMember(d => d.PaymentDate,
+                    s => s.MapFrom(s => s.PaymentDate.ToString("HH:mm:ss dd/MM/yyyy"))
+        );
+        //.ForMember(
+        //    d => d.BirthDate,
+        //    s => s.MapFrom(b => b.Booking.BirthDate.ToString("HH:mm:ss dd/MM/yyyy"))
+        //)
+        //.ForMember(
+        //    d => d.FullName,
+        //    s => s.MapFrom(b => b.Booking.FullName)
+        //)
+        //.ForMember(
+        //    d => d.PhoneNumber,
+        //    s => s.MapFrom(b => b.Booking.PhoneNumber)
+        //);
+
         //Phần anh Hải
 
 
