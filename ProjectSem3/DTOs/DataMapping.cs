@@ -15,7 +15,28 @@ public class DataMapping : Profile
         CreateMap<Policy, PolicyDTO>();
         CreateMap<PolicyDTO, Policy>();
 
-        CreateMap<BusesTrip, BusesTripDTO>();
+        CreateMap<BusesTrip, BusesTripDTO>().ForMember(
+            d=>d.BusTypeName,
+            s=>s.MapFrom(s=>s.Bus.BusType.Name)
+            ).ForMember(
+            d=>d.AirConditioned,
+            s=>s.MapFrom(s=>s.Bus.AirConditioned)
+            ).ForMember(
+            d => d.SeatCount,
+            s => s.MapFrom(s => s.Bus.SeatCount)
+            ).ForMember(
+            d => d.DepartureLocationName,
+            s => s.MapFrom(s => s.Trip.DepartureLocation.Name)
+            ).ForMember(
+            d => d.ArrivalLocationName,
+            s => s.MapFrom(s => s.Trip.ArrivalLocation.Name)
+            ).ForMember(
+            d => d.DateStart,
+            s => s.MapFrom(s => s.Trip.DateStart)
+            ).ForMember(
+            d => d.DateEnd,
+            s => s.MapFrom(s => s.Trip.DateEnd)
+            );
         CreateMap<BusesTripDTO, BusesTrip>();
 
         CreateMap<Booking, BookingDTO>().ForMember(

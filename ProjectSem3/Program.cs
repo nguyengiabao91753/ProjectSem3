@@ -13,6 +13,7 @@ using ProjectSem3.Services.BusService;
 using ProjectSem3.Services.BusTypeService;
 using ProjectSem3.Services.PolicyService;
 using System.Text;
+using ProjectSem3.Services.BusesTripService;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -56,7 +57,7 @@ builder.Services.AddDbContext<DatabaseContext>(option => option.UseLazyLoadingPr
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-
+builder.Services.AddScoped<BusesTripService, BusesTripServiceImpl>();
 builder.Services.AddScoped<AgeGroupService, AgeGroupServiceImpl>();
 builder.Services.AddScoped<TripService, TripServiceImpl>();
 builder.Services.AddScoped<LocationService, LocationServiceImpl>();
