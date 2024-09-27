@@ -11,5 +11,6 @@ public interface TripService
     public bool Update(TripDTO tripDTO);
 
     public bool Delete(int id);
+    public List<TripDTO> GetTripsWithLocationNames();
 
 }

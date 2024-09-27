@@ -6,7 +6,7 @@ public class BookingDTO
 
     public string FullName { get; set; } = null!;
 
-    public string? BirthDate { get; set; }
+    public string BirthDate { get; set; }
 
     public string? Email { get; set; }
 

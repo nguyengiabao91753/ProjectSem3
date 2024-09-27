@@ -15,6 +15,7 @@ using ProjectSem3.Services.PaypalService;
 using ProjectSem3.Services.PolicyService;
 using ProjectSem3.Services.TripService;
 using System.Text;
+using ProjectSem3.Services.BusesTripService;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -58,7 +59,7 @@ builder.Services.AddDbContext<DatabaseContext>(option => option.UseLazyLoadingPr
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-
+builder.Services.AddScoped<BusesTripService, BusesTripServiceImpl>();
 builder.Services.AddScoped<AgeGroupService, AgeGroupServiceImpl>();
 builder.Services.AddScoped<TripService, TripServiceImpl>();
 builder.Services.AddScoped<LocationService, LocationServiceImpl>();

@@ -1,31 +1,59 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using ProjectSem3.DTOs;
-using ProjectSem3.Services.TripService;
+using ProjectSem3.Services.AgeGroupService;
+using ProjectSem3.Services.BusesSeatService;
+using ProjectSem3.Services.BusesTripService;
 
 namespace ProjectSem3.Controllers;
-[Route("api/trip")]
+[Route("api/busestrip")]
 [ApiController]
-public class TripController : Controller
+public class BusesTripController : Controller
 {
-    private TripService tripService;
-
-    public TripController(TripService tripService)
+    private BusesTripService busesTripService;
+    public BusesTripController(BusesTripService busesTripService)
     {
-        this.tripService = tripService;
+        this.busesTripService = busesTripService;
     }
+
     [Consumes("application/json")]
     [Produces("application/json")]
     [HttpPost("create")]
-    public IActionResult Create([FromBody] TripDTO tripDTO)
+    public IActionResult Create([FromBody] BusesTripDTO busesTripDTO )
     {
         try
         {
-            bool result = tripService.Create(tripDTO);
+            bool result = busesTripService.Create(busesTripDTO);
 
             return Ok(new
             {
                 status = result
-            });
+            }
+            );
+
+            throw new Exception();
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(ex.Message);
+        }
+    }
+
+    [Consumes("application/json")]
+    [Produces("application/json")]
+    [HttpPut("update")]
+    public IActionResult Update([FromBody] BusesTripDTO busesTripDTO)
+    {
+        try
+        {
+            bool result = busesTripService.Update(busesTripDTO);
+
+            return Ok(new
+            {
+                status = result
+            }
+            );
+
+            throw new Exception();
         }
         catch (Exception ex)
         {
@@ -40,7 +68,7 @@ public class TripController : Controller
     {
         try
         {
-            var result = tripService.GetAll();
+            var result = busesTripService.GetAll();
 
             return Ok(result);
 
@@ -54,56 +82,16 @@ public class TripController : Controller
         }
     }
 
-
-    [HttpGet("trips-with-locations")]
-    public ActionResult<List<TripDTO>> GetTripsWithLocations()
-    {
-        var trips = tripService.GetTripsWithLocationNames();
-        return Ok(trips);
-    }
-
     [Consumes("application/json")]
     [Produces("application/json")]
-    [HttpPost("delete")]
-    public IActionResult Delete(int id)
+    [HttpPost("getbyid")]
+    public IActionResult GetById([FromBody] int id)
     {
         try
         {
-            var result = tripService.Delete(id);
+            var result = busesTripService.GetById(id);
 
-            return Ok(new
-            {
-                status = result
-            }
-             );
-
-
-
-            throw new Exception();
-        }
-        catch (Exception ex)
-        {
-            return BadRequest(ex.Message);
-        }
-    }
-
-
-    [Consumes("application/json")]
-    [Produces("application/json")]
-    [HttpPost("update")]
-    public IActionResult Update([FromBody] TripDTO tripDTO)
-    {
-        try
-        {
-            bool result = tripService.Update(tripDTO);
-
-            return Ok(new
-            {
-                status = result
-            }
-            );
-
-
+            return Ok(result);
 
             throw new Exception();
         }
