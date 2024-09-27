@@ -6,6 +6,6 @@ public class SeatHub : Hub
 {
     public async Task SelectSeat(int id, int status)
     {
-        await Clients.All.SendAsync("ReceiveSeatSelection", id, status);
+        await Clients.AllExcept(Context.ConnectionId).SendAsync("ReceiveSeatSelection", id, status);
     }
 }

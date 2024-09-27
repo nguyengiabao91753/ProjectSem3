@@ -15,21 +15,36 @@ public class DataMapping : Profile
         CreateMap<Policy, PolicyDTO>();
         CreateMap<PolicyDTO, Policy>();
 
-        CreateMap<BusesTrip, BusesTripDTO>();
+        CreateMap<BusesTrip, BusesTripDTO>().ForMember(
+            d=>d.BusTypeName,
+            s=>s.MapFrom(s=>s.Bus.BusType.Name)
+            ).ForMember(
+            d=>d.AirConditioned,
+            s=>s.MapFrom(s=>s.Bus.AirConditioned)
+            ).ForMember(
+            d => d.SeatCount,
+            s => s.MapFrom(s => s.Bus.SeatCount)
+            ).ForMember(
+            d => d.DepartureLocationName,
+            s => s.MapFrom(s => s.Trip.DepartureLocation.Name)
+            ).ForMember(
+            d => d.ArrivalLocationName,
+            s => s.MapFrom(s => s.Trip.ArrivalLocation.Name)
+            ).ForMember(
+            d => d.DateStart,
+            s => s.MapFrom(s => s.Trip.DateStart)
+            ).ForMember(
+            d => d.DateEnd,
+            s => s.MapFrom(s => s.Trip.DateEnd)
+            );
         CreateMap<BusesTripDTO, BusesTrip>();
 
         CreateMap<Booking, BookingDTO>().ForMember(
-            d => d.BirthDate,
-            s => s.MapFrom(b => b.BirthDate.ToString("dd/MM/yyyy"))
-            ).ForMember(
             d => d.BookingDate,
             s => s.MapFrom(b => b.BookingDate.ToString("HH:mm:ss dd/MM/yyyy"))
             );
 
         CreateMap<BookingDTO, Booking>().ForMember(
-           d => d.BirthDate,
-           s => s.MapFrom(b => DateTime.ParseExact(b.BirthDate, "dd/MM/yyyy", CultureInfo.InvariantCulture))
-           ).ForMember(
            d => d.BookingDate,
            s => s.MapFrom(b => DateTime.ParseExact(b.BookingDate, "HH:mm:ss dd/MM/yyyy", CultureInfo.InvariantCulture))
            );
