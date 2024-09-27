@@ -45,7 +45,7 @@ public class TripServiceImpl : TripService
             Console.WriteLine("Error creating trip: " + ex.Message);
             return false;
         }
-    }
+        }
 
 
 
@@ -63,6 +63,26 @@ public class TripServiceImpl : TripService
     public List<TripDTO> GetAll()
     {
         return mapper.Map<List<TripDTO>>(db.Trips.ToList());
+    }
+
+    public List<TripDTO> GetTripsWithLocationNames()
+    {
+        var tripsWithLocationNames = db.Trips
+            .Include(t => t.DepartureLocation) // Giả sử bạn có quan hệ với bảng Location
+            .Select(t => new TripDTO
+            {
+                TripId = t.TripId,
+                DepartureLocationId = t.DepartureLocationId,
+                ArrivalLocationId = t.ArrivalLocationId,
+                DateStart = t.DateStart.ToString("yyyy-MM-dd HH:mm:ss"), // Định dạng lại thành chuỗi
+                DateEnd = t.DateEnd.ToString("yyyy-MM-dd HH:mm:ss"),
+                Status = t.Status,
+                DepartureLocationName = t.DepartureLocation.Name,// Lấy tên/ Lấy tên địa điểm xuất phát
+                ArrivalLocationName = t.ArrivalLocation.Name
+            })
+            .ToList();
+
+        return tripsWithLocationNames;
     }
 
     public bool Update(TripDTO tripDTO)

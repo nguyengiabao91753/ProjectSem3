@@ -43,8 +43,8 @@ public class DataMapping : Profile
             d => d.BirthDate,
             s => s.MapFrom(b => b.BirthDate.ToString("dd/MM/yyyy"))
             ).ForMember(
-            d=>d.BookingDate,
-            s=>s.MapFrom(b => b.BookingDate.ToString("HH:mm:ss dd/MM/yyyy"))
+            d => d.BookingDate,
+            s => s.MapFrom(b => b.BookingDate.ToString("HH:mm:ss dd/MM/yyyy"))
             );
 
         CreateMap<BookingDTO, Booking>().ForMember(
@@ -71,6 +71,31 @@ public class DataMapping : Profile
         );
         CreateMap<BusesSeatDTO, BusesSeat>();
 
+        CreateMap<PaymentDTO, Payment>()
+        .ForMember(d => d.PaymentDate,
+                    s => s.MapFrom(s => DateTime.ParseExact(s.PaymentDate, "HH:mm:ss dd/MM/yyyy", CultureInfo.InvariantCulture))
+        );
+        // .ForMember(
+        //    s => s.Booking.BirthDate,
+        //    s => s.MapFrom(b => DateTime.ParseExact(b.BirthDate, "HH:mm:ss dd/MM/yyyy", CultureInfo.InvariantCulture))
+        // );
+        CreateMap<Payment, PaymentDTO>()
+        .ForMember(d => d.PaymentDate,
+                    s => s.MapFrom(s => s.PaymentDate.ToString("HH:mm:ss dd/MM/yyyy"))
+        );
+        //.ForMember(
+        //    d => d.BirthDate,
+        //    s => s.MapFrom(b => b.Booking.BirthDate.ToString("HH:mm:ss dd/MM/yyyy"))
+        //)
+        //.ForMember(
+        //    d => d.FullName,
+        //    s => s.MapFrom(b => b.Booking.FullName)
+        //)
+        //.ForMember(
+        //    d => d.PhoneNumber,
+        //    s => s.MapFrom(b => b.Booking.PhoneNumber)
+        //);
+
         //Phần anh Hải
 
 
@@ -81,19 +106,24 @@ public class DataMapping : Profile
         CreateMap<Location, LocationDTO>();
         CreateMap<LocationDTO, Location>();
         // Bang trip
-        CreateMap<Trip, TripDTO>().ForMember(
-            d => d.DateStart,
-            s => s.MapFrom(s => s.DateStart.ToString("HH:mm:ss dd/MM/yyyy "))
-            ).ForMember(
-            d => d.DateEnd,
-            s => s.MapFrom(s => s.DateEnd.ToString("HH:mm:ss dd/MM/yyyy "))
+        CreateMap<Trip, TripDTO>()
+            .ForMember(
+                d => d.DateStart,
+                s => s.MapFrom(src => src.DateStart.ToString("HH:mm:ss dd/MM/yyyy"))
+            )
+            .ForMember(
+                d => d.DateEnd,
+                s => s.MapFrom(src => src.DateEnd.ToString("HH:mm:ss dd/MM/yyyy"))
             );
-        CreateMap<TripDTO, Trip>().ForMember(
-            d => d.DateStart,
-            s => s.MapFrom(b => DateTime.ParseExact(b.DateStart, "HH:mm:ss dd/MM/yyyy", CultureInfo.InvariantCulture))
-            ).ForMember(
-            d => d.DateEnd,
-            s => s.MapFrom(b => DateTime.ParseExact(b.DateEnd, "HH:mm:ss dd/MM/yyyy", CultureInfo.InvariantCulture))
+
+        CreateMap<TripDTO, Trip>()
+            .ForMember(
+                d => d.DateStart,
+                s => s.MapFrom(dto => DateTime.ParseExact(dto.DateStart, "HH:mm:ss dd/MM/yyyy", CultureInfo.InvariantCulture))
+            )
+            .ForMember(
+                d => d.DateEnd,
+                s => s.MapFrom(dto => DateTime.ParseExact(dto.DateEnd, "HH:mm:ss dd/MM/yyyy", CultureInfo.InvariantCulture))
             );
 
     }

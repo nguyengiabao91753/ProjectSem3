@@ -17,6 +17,11 @@ public class LocationServiceImpl : LocationService
         this.mapper = mapper;
     }
 
+    public bool CheckLocationNameExists(string name)
+    {
+        return db.Locations.Any(l => l.Name == name);
+    }
+
     public bool Create(LocationDTO locationDTO)
     {
         try

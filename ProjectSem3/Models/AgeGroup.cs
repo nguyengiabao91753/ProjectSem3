@@ -13,5 +13,5 @@ public partial class AgeGroup
 
     public byte? Status { get; set; }
 
-    public virtual ICollection<Booking> Bookings { get; set; } = new List<Booking>();
+    public virtual ICollection<BookingDetail> BookingDetails { get; set; } = new List<BookingDetail>();
 }

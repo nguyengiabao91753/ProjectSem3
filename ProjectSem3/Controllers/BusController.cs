@@ -28,6 +28,27 @@ public class BusController : ControllerBase
         }
     }
 
+    [HttpGet("check-license-plate-exists")]
+    public IActionResult CheckLicensePlateExists([FromQuery] string licensePlate)
+    {
+        try
+        {
+            var exists = busService.checkLicensePlateExists(licensePlate);
+            var status = exists == null ? false : true;
+            return Ok(new
+            {
+                status = status,
+                busId = exists == null ? 0 : exists.BusId
+            });
+
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(ex.Message);
+
+        }
+    }
+
     [Produces("application/json")]
     [HttpGet("find-by-id/{id}")]
     public IActionResult FindById(int id)
