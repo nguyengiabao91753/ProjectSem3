@@ -1,60 +1,31 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using ProjectSem3.DTOs;
-using ProjectSem3.Services.AgeGroupService;
+using ProjectSem3.Services.TripService;
 
 namespace ProjectSem3.Controllers;
-[Route("api/agegroup")]
+[Route("api/trip")]
 [ApiController]
-public class AgeGroupController : Controller
+public class TripController : Controller
 {
-    private AgeGroupService ageGroupService;
+    private TripService tripService;
 
-    public AgeGroupController(AgeGroupService ageGroupService)
+    public TripController(TripService tripService)
     {
-        this.ageGroupService = ageGroupService;
+        this.tripService = tripService;
     }
-
     [Consumes("application/json")]
     [Produces("application/json")]
     [HttpPost("create")]
-    public IActionResult Create([FromBody] AgeGroupDTO ageGroupDTO)
+    public IActionResult Create([FromBody] TripDTO tripDTO)
     {
         try
         {
-            bool result = ageGroupService.Create(ageGroupDTO);
+            bool result = tripService.Create(tripDTO);
 
             return Ok(new
             {
                 status = result
-            }
-            );
-
-            throw new Exception();
-        }
-        catch (Exception ex)
-        {
-            return BadRequest(ex.Message);
-        }
-    }
-
-    [Consumes("application/json")]
-    [Produces("application/json")]
-    [HttpPost("update")]
-    public IActionResult Update([FromBody] AgeGroupDTO ageGroupDTO)
-    {
-        try
-        {
-            bool result = ageGroupService.Update(ageGroupDTO);
-
-            return Ok(new
-            {
-                status = result
-            }
-            );
-
-
-
-            throw new Exception();
+            });
         }
         catch (Exception ex)
         {
@@ -69,7 +40,7 @@ public class AgeGroupController : Controller
     {
         try
         {
-            var result = ageGroupService.GetAll();
+            var result = tripService.GetAll();
 
             return Ok(result);
 
@@ -84,6 +55,12 @@ public class AgeGroupController : Controller
     }
 
 
+    [HttpGet("trips-with-locations")]
+    public ActionResult<List<TripDTO>> GetTripsWithLocations()
+    {
+        var trips = tripService.GetTripsWithLocationNames();
+        return Ok(trips);
+    }
 
     [Consumes("application/json")]
     [Produces("application/json")]
@@ -92,13 +69,39 @@ public class AgeGroupController : Controller
     {
         try
         {
-            var result = ageGroupService.Delete(id);
+            var result = tripService.Delete(id);
 
             return Ok(new
             {
                 status = result
             }
              );
+
+
+
+            throw new Exception();
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(ex.Message);
+        }
+    }
+
+
+    [Consumes("application/json")]
+    [Produces("application/json")]
+    [HttpPost("update")]
+    public IActionResult Update([FromBody] TripDTO tripDTO)
+    {
+        try
+        {
+            bool result = tripService.Update(tripDTO);
+
+            return Ok(new
+            {
+                status = result
+            }
+            );
 
 
 

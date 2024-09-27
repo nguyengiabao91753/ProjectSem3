@@ -1,27 +1,28 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using ProjectSem3.DTOs;
 using ProjectSem3.Services.AgeGroupService;
+using ProjectSem3.Services.BusesSeatService;
+using ProjectSem3.Services.BusesTripService;
 
 namespace ProjectSem3.Controllers;
-[Route("api/agegroup")]
+[Route("api/busestrip")]
 [ApiController]
-public class AgeGroupController : Controller
+public class BusesTripController : Controller
 {
-    private AgeGroupService ageGroupService;
-
-    public AgeGroupController(AgeGroupService ageGroupService)
+    private BusesTripService busesTripService;
+    public BusesTripController(BusesTripService busesTripService)
     {
-        this.ageGroupService = ageGroupService;
+        this.busesTripService = busesTripService;
     }
 
     [Consumes("application/json")]
     [Produces("application/json")]
     [HttpPost("create")]
-    public IActionResult Create([FromBody] AgeGroupDTO ageGroupDTO)
+    public IActionResult Create([FromBody] BusesTripDTO busesTripDTO )
     {
         try
         {
-            bool result = ageGroupService.Create(ageGroupDTO);
+            bool result = busesTripService.Create(busesTripDTO);
 
             return Ok(new
             {
@@ -39,20 +40,18 @@ public class AgeGroupController : Controller
 
     [Consumes("application/json")]
     [Produces("application/json")]
-    [HttpPost("update")]
-    public IActionResult Update([FromBody] AgeGroupDTO ageGroupDTO)
+    [HttpPut("update")]
+    public IActionResult Update([FromBody] BusesTripDTO busesTripDTO)
     {
         try
         {
-            bool result = ageGroupService.Update(ageGroupDTO);
+            bool result = busesTripService.Update(busesTripDTO);
 
             return Ok(new
             {
                 status = result
             }
             );
-
-
 
             throw new Exception();
         }
@@ -69,7 +68,7 @@ public class AgeGroupController : Controller
     {
         try
         {
-            var result = ageGroupService.GetAll();
+            var result = busesTripService.GetAll();
 
             return Ok(result);
 
@@ -83,24 +82,16 @@ public class AgeGroupController : Controller
         }
     }
 
-
-
     [Consumes("application/json")]
     [Produces("application/json")]
-    [HttpPost("delete")]
-    public IActionResult Delete(int id)
+    [HttpPost("getbyid")]
+    public IActionResult GetById([FromBody] int id)
     {
         try
         {
-            var result = ageGroupService.Delete(id);
+            var result = busesTripService.GetById(id);
 
-            return Ok(new
-            {
-                status = result
-            }
-             );
-
-
+            return Ok(result);
 
             throw new Exception();
         }
