@@ -1,6 +1,4 @@
-﻿using ProjectSem3.Models;
-
-namespace ProjectSem3.DTOs;
+﻿namespace ProjectSem3.DTOs;
 
 public class BookingDTO
 {
@@ -36,5 +34,5 @@ public class BookingDTO
 
     public byte? PaymentStatus { get; set; }
 
-    
+
 }

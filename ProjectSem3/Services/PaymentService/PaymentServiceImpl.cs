@@ -2,7 +2,7 @@
 using ProjectSem3.DTOs;
 using ProjectSem3.Models;
 
-namespace ProjectSem3.Services.Payment;
+namespace ProjectSem3.Services.PaymentService;
 
 public class PaymentServiceImpl : PaymentService
 {
@@ -15,13 +15,20 @@ public class PaymentServiceImpl : PaymentService
         mapper = _mapper;
     }
 
-    public bool Create(PaymentDTO dto)
-    {
-        throw new NotImplementedException();
-    }
+    //public bool Create(PaymentDTO dto)
+    //{
+    //    throw new NotImplementedException();
+    //}
 
     public List<PaymentDTO> GetAll()
     {
         return mapper.Map<List<PaymentDTO>>(db.Payments.OrderByDescending(p => p.PaymentId).ToList());
     }
+
+    public PaymentDTO GetPaymentById(int id)
+    {
+        return mapper.Map<PaymentDTO>(db.Payments.Find(id));
+    }
 }
+
+
