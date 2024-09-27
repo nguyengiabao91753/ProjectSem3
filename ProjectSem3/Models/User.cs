@@ -9,7 +9,7 @@ public partial class User
 
     public string FullName { get; set; } = null!;
 
-    public DateOnly BirthDate { get; set; }
+    public DateTime BirthDate { get; set; }
 
     public string? Email { get; set; }
 
@@ -17,7 +17,7 @@ public partial class User
 
     public string? Address { get; set; }
 
-    public DateTime? CreatedAt { get; set; }
+    public DateTime CreatedAt { get; set; }
 
     public virtual Account? Account { get; set; }
 
