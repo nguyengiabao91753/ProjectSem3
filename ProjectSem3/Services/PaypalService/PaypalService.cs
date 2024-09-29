@@ -18,20 +18,19 @@ public class PaypalService
         mapper = _mapper;
     }
 
-    public PayPal.Api.Payment CreatePayment(IEnumerable<BookingDetailDTO> items, string baseUrl)
+    public PayPal.Api.Payment CreatePayment(IEnumerable<BookingDTO> items, string baseUrl)
     {
-        var subtotal = 0M;
+        var subtotal = items.Sum(x => x.PriceAfterDiscount ?? 0);
 
         var itemList = new ItemList
         {
             items = items.Select(x =>
             {
-                subtotal += (decimal)x.PriceAfterDiscount;
                 return new Item
                 {
                     name = x.TicketCode,
                     currency = "USD",
-                    price = x.PriceAfterDiscount.ToString(),
+                    price = (x.PriceAfterDiscount ?? 0).ToString("F2"),
                     quantity = "1"
                 };
             }).ToList()
@@ -51,11 +50,11 @@ public class PaypalService
                     currency = "USD",
                     details = new()
                     {
-                        shipping = shipping.ToString(),
-                        tax = tax.ToString(),
-                        subtotal = subtotal.ToString()
+                        shipping = shipping.ToString("F2"),
+                        tax = tax.ToString("F2"),
+                        subtotal = subtotal.ToString("F2")
                     },
-                    total = (shipping + tax + subtotal).ToString()
+                    total = (shipping + tax + subtotal).ToString("F2")
                 }
             }
         };
@@ -75,35 +74,50 @@ public class PaypalService
             }
         };
 
-        var createdPayment = payment.Create(GetContext());
-
-        return createdPayment;
+        return payment.Create(GetContext());
 
     }
 
-    public PayPal.Api.Payment ExecutePayment(ExecutePaymentDto dto, PaymentDTO paymentDTO)
+    public PayPal.Api.Payment ExecutePayment(ExecutePaymentDto dto)
     {
-        var paymentExecution = new PaymentExecution { payer_id = dto.PayerId, };
+        var paymentExecution = new PaymentExecution { payer_id = dto.PayerId };
         var payment = new PayPal.Api.Payment { id = dto.PaymentId };
 
         try
         {
             var executedPayment = payment.Execute(GetContext(), paymentExecution);
 
-            var pa = mapper.Map<Models.Payment>(paymentDTO);
-            db.Payments.Add(pa);
-
-            if (db.SaveChanges() > 0)
+            if (executedPayment.state.ToLower() == "approved")
             {
-                return executedPayment;
+                var paymentModel = new Models.Payment
+                {
+                    BookingId = dto.BookingItems.FirstOrDefault()?.BookingId,
+                    PaymentDate = DateTime.Now,
+                    Amount = dto.BookingItems.Sum(x => (decimal)x.PriceAfterDiscount),
+                    PaymentMethod = "Paypal"
+                };
+
+                db.Payments.Add(paymentModel);
+                var result = db.SaveChanges();
+
+                if (result > 0)
+                {
+                    return executedPayment;
+                }
+                else
+                {
+                    throw new Exception("Failed to save payment to the database.");
+                }
             }
             else
             {
-                return null;
+                throw new Exception("Payment execution failed or was not approved.");
             }
+
         }
         catch (Exception ex)
         {
+            Console.WriteLine($"Error: {ex.Message}");
             return null;
         }
 

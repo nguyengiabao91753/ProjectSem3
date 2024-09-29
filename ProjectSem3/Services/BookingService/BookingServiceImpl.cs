@@ -10,7 +10,7 @@ public class BookingServiceImpl : BookingService
     private IMapper mapper;
     public BookingServiceImpl(
         DatabaseContext databaseContext,
-        IMapper mappern
+        IMapper mapper
 
         )
     {

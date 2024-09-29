@@ -51,14 +51,12 @@ public class PaymentController : ControllerBase
     }
 
     [HttpPost("create-paypal")]
-    public IActionResult CreatePaypal([FromBody] IEnumerable<BookingDetailDTO> dto)
+    public IActionResult CreatePaypal([FromBody] IEnumerable<BookingDTO> dto)
     {
         try
         {
-            var request = HttpContext.Request;
-            var baseUrl = $"{request.Scheme}://{request.Host}{request.PathBase}";
+            var baseUrl = HttpContext.Request.Host.Value;
 
-            // Gọi PaypalService đã inject
             var payment = paypalService.CreatePayment(dto, baseUrl);
 
             return Ok(payment);
@@ -70,11 +68,11 @@ public class PaymentController : ControllerBase
     }
 
     [HttpPost("execute-paypal")]
-    public IActionResult ExecutePaypal([FromBody] ExecutePaymentDto dto, [FromBody] PaymentDTO paymentDTO)
+    public IActionResult ExecutePaypal([FromBody] ExecutePaymentDto dto)
     {
         try
         {
-            var payment = paypalService.ExecutePayment(dto, paymentDTO);
+            var payment = paypalService.ExecutePayment(dto);
 
             if (payment != null)
             {

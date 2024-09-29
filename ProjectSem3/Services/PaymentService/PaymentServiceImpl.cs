@@ -15,6 +15,19 @@ public class PaymentServiceImpl : PaymentService
         mapper = _mapper;
     }
 
+    public bool Create(Payment payment)
+    {
+        try
+        {
+            db.Payments.Add(payment);
+            return db.SaveChanges() > 0;
+        }
+        catch (Exception ex)
+        {
+            return false;
+        }
+    }
+
     //public bool Create(PaymentDTO dto)
     //{
     //    throw new NotImplementedException();
