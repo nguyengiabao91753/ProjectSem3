@@ -1,7 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using ProjectSem3.DTOs;
-using ProjectSem3.Services.AgeGroupService;
-using ProjectSem3.Services.BusesSeatService;
 using ProjectSem3.Services.BusesTripService;
 
 namespace ProjectSem3.Controllers;
@@ -18,7 +16,7 @@ public class BusesTripController : Controller
     [Consumes("application/json")]
     [Produces("application/json")]
     [HttpPost("create")]
-    public IActionResult Create([FromBody] BusesTripDTO busesTripDTO )
+    public IActionResult Create([FromBody] BusesTripDTO busesTripDTO)
     {
         try
         {

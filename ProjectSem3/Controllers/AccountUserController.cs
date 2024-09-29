@@ -69,7 +69,8 @@ public class AccountUserController :Controller
           
          catch (Exception ex)
         {
-            // Bắt lỗi ngoại lệ và trả về thông báo lỗi
+            // Thêm log chi tiết lỗi
+            Console.WriteLine("Error during account creation: " + ex.Message);
             return StatusCode(500, new { error = "Error during registration", details = ex.Message
         });
     }
@@ -202,4 +203,20 @@ public class AccountUserController :Controller
         }
     }
 
+    [HttpPost("inactive")]
+    public IActionResult Inactive([FromBody] AccountUserDTO accountUserDTO)
+    {
+        bool result = accountUserService.InActiveAccount(accountUserDTO);
+        return result ? Ok(new { status = "Account set to inactive successfully" })
+                      : BadRequest(new { error = "Failed to set account to inactive" });
+    }
+
+
+    [HttpPost("active")]
+    public IActionResult Active([FromBody] AccountUserDTO accountUserDTO)
+    {
+        bool result = accountUserService.ActiveAccount(accountUserDTO);
+        return result ? Ok(new { status = "Account set to active successfully" })
+                      : BadRequest(new { error = "Failed to set account to active" });
+    }
 }

@@ -13,4 +13,6 @@ public interface AccountUserService
     public bool CreateAccountUser(AccountUserDTO accountUserDTO);
     public bool UpdateAccountUser(AccountUserDTO accountUserDTO);
     public bool DeleteAccountUser(int id);
+    public bool InActiveAccount(AccountUserDTO accountUserDTO);
+    public bool ActiveAccount(AccountUserDTO accountUserDTO);
 }

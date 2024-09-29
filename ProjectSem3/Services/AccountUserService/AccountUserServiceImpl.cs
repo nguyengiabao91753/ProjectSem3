@@ -10,7 +10,7 @@ using System.Text;
 
 namespace ProjectSem3.Services.AccountService;
 
-public class AccountUserServiceImpl(DatabaseContext db, IMapper mapper,IConfiguration configuration) : AccountUserService
+public class AccountUserServiceImpl(DatabaseContext db, IMapper mapper, IConfiguration configuration) : AccountUserService
 {
 
     private readonly DatabaseContext databaseContext = db;
@@ -19,39 +19,52 @@ public class AccountUserServiceImpl(DatabaseContext db, IMapper mapper,IConfigur
 
     public bool CreateAccountUser(AccountUserDTO accountUserDTO)
     {
-  
-            try
+        using var transaction = db.Database.BeginTransaction(); // Dùng transaction để đảm bảo dữ liệu an toàn
+
+        try
+        {
+            //Kiểm tra xem username đã tồn tại hay chưa
+            var existingAccount = db.Accounts.FirstOrDefault(a => a.Username == accountUserDTO.Username);
+            if (existingAccount != null)
             {
-                //Kiểm tra xem username đã tồn tại hay chưa
-                var existingAccount = db.Accounts.FirstOrDefault(a=> a.Username == accountUserDTO.Username);
-                if (existingAccount != null)
-                {   
-                    //Username đã tòn tại
-                    return false;
-                }
-                // Map accountUserDTO sang Account
-                var account = mapper.Map<Account>(accountUserDTO);
-                
-                // Map accountUserDTO sang User, gán AccountId cho User
-                var user = mapper.Map<User>(accountUserDTO);
-                user.CreatedAt = DateTime.Now;
-                db.Users.Add(user);
-                
-                if (db.SaveChanges()>0)
-                {
-                    account.AccountId = user.UserId;
-                
-                    db.Accounts.Add(account);
-                
-                    // Lưu thay đổi cho cả hai bảng
-                    return db.SaveChanges() > 0;
-                }
+                //Username đã tòn tại
                 return false;
             }
+            //// Map accountUserDTO sang Account
+            //var account = mapper.Map<Account>(accountUserDTO);
+            //// Map accountUserDTO sang User, gán AccountId cho User
+            //var user = mapper.Map<User>(accountUserDTO);
+            //user.CreatedAt = DateTime.Now;
+            //db.Users.Add(user);
+            //if (db.SaveChanges()>0)
+            //{
+            //    account.AccountId = user.UserId;
+
+            //    db.Accounts.Add(account);
+
+            //    // Lưu thay đổi cho cả hai bảng
+            //    return db.SaveChanges() > 0;
+            //}
+            //return false;
+
+            var user = mapper.Map<User>(accountUserDTO);
+            user.CreatedAt = DateTime.Now;
+            db.Users.Add(user);  
+            db.SaveChanges();
+
+            var account = mapper.Map<Account>(accountUserDTO);
+            account.AccountId = user.UserId;
+            db.Accounts.Add(account);
+            db.SaveChanges();
+            transaction.Commit();
+            return true;
+        }
             catch (Exception ex)
             {
-                // Rollback transaction nếu có lỗi
-                return false;
+            // Rollback nếu có lỗi
+            transaction.Rollback();
+            Console.WriteLine($"Error during account creation: {ex.Message}");
+            return false;
             }
         
     }
@@ -208,5 +221,53 @@ public class AccountUserServiceImpl(DatabaseContext db, IMapper mapper,IConfigur
     public Account FindByUsername(string username)
     {
         return db.Accounts.FirstOrDefault(a => a.Username == username);
+    }
+
+    public bool InActiveAccount(AccountUserDTO accountUserDTO)
+    {
+        try
+        {
+            // Tìm Account và User theo id
+            var account = db.Accounts.Find(accountUserDTO.UserId);
+            var user = db.Users.Find(accountUserDTO.UserId);
+            // Kiểm tra nếu tìm thấy cả account và user
+            if (account != null && account.Status != 0)
+            {
+                account.Status = 0;
+                // Lưu thay đổi
+                return db.SaveChanges() > 0;
+            }
+            return false;
+
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error in InActiveAccount: {ex.Message}");
+            return false;
+        }
+    }
+
+    public bool ActiveAccount(AccountUserDTO accountUserDTO)
+    {
+        try
+        {
+            // Tìm Account và User theo id
+            var account = db.Accounts.Find(accountUserDTO.UserId);
+            var user = db.Users.Find(accountUserDTO.UserId);
+            // Kiểm tra nếu tìm thấy cả account và user
+            if (account != null && account.Status == 0)
+            {
+                account.Status = 1;
+                // Lưu thay đổi
+                return db.SaveChanges() > 0;
+            }
+            return false;
+
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error in InActiveAccount: {ex.Message}");
+            return false;
+        }
     }
 }

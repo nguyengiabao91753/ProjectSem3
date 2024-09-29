@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 
 namespace ProjectSem3.Models;
 
@@ -49,6 +47,7 @@ public partial class DatabaseContext : DbContext
 
 
         => optionsBuilder.UseSqlServer("Server=Eragon\\SQLEXPRESS;Database=Bus_Ticket;user id=hai;password=123;trusted_connection=true;encrypt=false");
+
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

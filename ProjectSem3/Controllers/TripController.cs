@@ -54,14 +54,20 @@ public class TripController : Controller
         }
     }
 
-
-    [HttpGet("trips-with-locations")]
-    public ActionResult<List<TripDTO>> GetTripsWithLocations()
+    [Produces("application/json")]
+    [HttpGet("find-by-id/{id}")]
+    public IActionResult FindById(int id)
     {
-        var trips = tripService.GetTripsWithLocationNames();
-        return Ok(trips);
+        try
+        {
+            var result = tripService.findById(id);
+            return Ok(result);
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(ex.Message);
+        }
     }
-
     [Consumes("application/json")]
     [Produces("application/json")]
     [HttpPost("delete")]
