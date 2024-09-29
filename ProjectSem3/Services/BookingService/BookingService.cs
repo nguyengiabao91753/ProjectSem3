@@ -5,7 +5,7 @@ namespace ProjectSem3.Services.BookingService;
 
 public interface BookingService
 {
-    public bool Create(BookingDTO bookingDTO,List<BookingDetail> bookingDetails);
+    public bool Create(BookingDTO bookingDTO,List<BookingDetailDTO> bookingDetailsdto);
 
     public bool Update(BookingDTO bookingDTO);
 

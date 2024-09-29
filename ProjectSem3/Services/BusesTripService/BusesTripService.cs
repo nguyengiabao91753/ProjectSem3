@@ -12,5 +12,5 @@ public interface BusesTripService
 
     public List<BusesTripDTO> GetAll();
 
-    public BusesSeatDTO GetById(int id);
+    public BusesTripDTO GetById(int id);
 }

@@ -13,6 +13,7 @@ using ProjectSem3.Services.PolicyService;
 using ProjectSem3.Services.TripService;
 using System.Text;
 using ProjectSem3.Services.BusesTripService;
+using ProjectSem3.Services.BookingService;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -60,7 +61,7 @@ builder.Services.AddScoped<BusesTripService, BusesTripServiceImpl>();
 builder.Services.AddScoped<AgeGroupService, AgeGroupServiceImpl>();
 builder.Services.AddScoped<TripService, TripServiceImpl>();
 builder.Services.AddScoped<LocationService, LocationServiceImpl>();
-
+builder.Services.AddScoped<BookingService, BookingServiceImpl>();
 
 builder.Services.AddScoped<BusTypeService, BusTypeServiceImpl>();
 builder.Services.AddScoped<BusService, BusServiceImpl>();

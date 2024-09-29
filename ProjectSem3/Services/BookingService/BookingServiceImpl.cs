@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using ProjectSem3.DTOs;
 using ProjectSem3.Models;
+using System.Collections.Generic;
 
 namespace ProjectSem3.Services.BookingService;
 
@@ -10,7 +11,7 @@ public class BookingServiceImpl : BookingService
     private IMapper mapper;
     public BookingServiceImpl(
         DatabaseContext databaseContext,
-        IMapper mappern
+        IMapper mapper
 
         )
     {
@@ -31,11 +32,12 @@ public class BookingServiceImpl : BookingService
         return id;
     }
 
-    public bool Create(BookingDTO bookingDTO, List<BookingDetail> bookingDetails)
+    public bool Create(BookingDTO bookingDTO, List<BookingDetailDTO> bookingDetailsdto)
     {
         try
         {
             var book = mapper.Map<Booking>(bookingDTO);
+            var bookingDetails = mapper.Map<List<BookingDetail>>(bookingDetailsdto);
             var total = bookingDetails.Sum(d => d.PriceAfterDiscount);
             book.Total = total;
             book.BookingDate = DateTime.Now;
@@ -57,6 +59,7 @@ public class BookingServiceImpl : BookingService
                             db.BusesSeats.Update(seat);
  
                             bookingDetails[i].BookingId = book.BookingId;
+                            bookingDetails[i].TicketStatus = 1;
                             db.BookingDetails.Add(bookingDetails[i]);
 
                             if (db.SaveChanges() > 0)

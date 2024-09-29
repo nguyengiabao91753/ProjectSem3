@@ -48,6 +48,9 @@ public class DataMapping : Profile
            d => d.BookingDate,
            s => s.MapFrom(b => DateTime.ParseExact(b.BookingDate, "HH:mm:ss dd/MM/yyyy", CultureInfo.InvariantCulture))
            );
+
+        CreateMap<BookingDetail, BookingDetailDTO>();
+        CreateMap<BookingDetailDTO, BookingDetail>();
         //Phần anh Duy
         CreateMap<BusType, BusTypeDTO>().ReverseMap();
 
