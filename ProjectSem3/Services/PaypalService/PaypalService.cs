@@ -1,18 +1,24 @@
-﻿using PayPal.Api;
+﻿using AutoMapper;
+using PayPal.Api;
 using ProjectSem3.DTOs;
+using ProjectSem3.Models;
 
 namespace ProjectSem3.Services.PaypalService;
 
 public class PaypalService
 {
     private readonly IConfiguration configuration;
+    private readonly DatabaseContext db;
+    private readonly IMapper mapper;
 
-    public PaypalService(IConfiguration _configuration)
+    public PaypalService(IConfiguration _configuration, DatabaseContext _db, IMapper _mapper)
     {
         configuration = _configuration;
+        db = _db;
+        mapper = _mapper;
     }
 
-    public Payment CreatePayment(IEnumerable<PaymentDTO> items, string baseUrl)
+    public PayPal.Api.Payment CreatePayment(IEnumerable<BookingDetailDTO> items, string baseUrl)
     {
         var subtotal = 0M;
 
@@ -20,12 +26,13 @@ public class PaypalService
         {
             items = items.Select(x =>
             {
-                subtotal += x.Amount;
+                subtotal += (decimal)x.PriceAfterDiscount;
                 return new Item
                 {
-                    name = x.BusTickCode,
+                    name = x.TicketCode,
                     currency = "USD",
-                    price = x.Amount.ToString()
+                    price = x.PriceAfterDiscount.ToString(),
+                    quantity = "1"
                 };
             }).ToList()
         };
@@ -53,7 +60,7 @@ public class PaypalService
             }
         };
 
-        var payment = new Payment
+        var payment = new PayPal.Api.Payment
         {
             intent = "sale",
             payer = new Payer
@@ -68,15 +75,38 @@ public class PaypalService
             }
         };
 
-        return payment.Create(GetContext());
+        var createdPayment = payment.Create(GetContext());
+
+        return createdPayment;
+
     }
 
-    public Payment ExecutePayment(ExecutePaymentDto dto)
+    public PayPal.Api.Payment ExecutePayment(ExecutePaymentDto dto, PaymentDTO paymentDTO)
     {
         var paymentExecution = new PaymentExecution { payer_id = dto.PayerId, };
-        var payment = new Payment { id = dto.PaymentId };
+        var payment = new PayPal.Api.Payment { id = dto.PaymentId };
 
-        return payment.Execute(GetContext(), paymentExecution);
+        try
+        {
+            var executedPayment = payment.Execute(GetContext(), paymentExecution);
+
+            var pa = mapper.Map<Models.Payment>(paymentDTO);
+            db.Payments.Add(pa);
+
+            if (db.SaveChanges() > 0)
+            {
+                return executedPayment;
+            }
+            else
+            {
+                return null;
+            }
+        }
+        catch (Exception ex)
+        {
+            return null;
+        }
+
     }
 
     private APIContext GetContext() =>

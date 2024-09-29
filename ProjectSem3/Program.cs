@@ -1,12 +1,12 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.IdentityModel.Tokens;
 using ProjectSem3.DTOs;
 using ProjectSem3.Hubs;
 using ProjectSem3.Models;
 using ProjectSem3.Services.AgeGroupService;
 using ProjectSem3.Services.BusesSeatService;
+using ProjectSem3.Services.BusesTripService;
 using ProjectSem3.Services.BusService;
 using ProjectSem3.Services.BusTypeService;
 using ProjectSem3.Services.LocationService;
@@ -15,7 +15,6 @@ using ProjectSem3.Services.PaypalService;
 using ProjectSem3.Services.PolicyService;
 using ProjectSem3.Services.TripService;
 using System.Text;
-using ProjectSem3.Services.BusesTripService;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -63,7 +62,6 @@ builder.Services.AddScoped<BusesTripService, BusesTripServiceImpl>();
 builder.Services.AddScoped<AgeGroupService, AgeGroupServiceImpl>();
 builder.Services.AddScoped<TripService, TripServiceImpl>();
 builder.Services.AddScoped<LocationService, LocationServiceImpl>();
-builder.Services.TryAddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
 
 builder.Services.AddScoped<BusTypeService, BusTypeServiceImpl>();
@@ -71,6 +69,7 @@ builder.Services.AddScoped<BusService, BusServiceImpl>();
 builder.Services.AddScoped<BusesSeatService, BusesSeatServiceImpl>();
 builder.Services.AddScoped<PaymentService, PaymentServiceImpl>();
 builder.Services.AddScoped<PaypalService>();
+//builder.Services.TryAddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
 builder.Services.AddScoped<PolicyService, PolicyServiceImpl>();
 

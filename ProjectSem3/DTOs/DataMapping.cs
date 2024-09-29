@@ -16,11 +16,11 @@ public class DataMapping : Profile
         CreateMap<PolicyDTO, Policy>();
 
         CreateMap<BusesTrip, BusesTripDTO>().ForMember(
-            d=>d.BusTypeName,
-            s=>s.MapFrom(s=>s.Bus.BusType.Name)
+            d => d.BusTypeName,
+            s => s.MapFrom(s => s.Bus.BusType.Name)
             ).ForMember(
-            d=>d.AirConditioned,
-            s=>s.MapFrom(s=>s.Bus.AirConditioned)
+            d => d.AirConditioned,
+            s => s.MapFrom(s => s.Bus.AirConditioned)
             ).ForMember(
             d => d.SeatCount,
             s => s.MapFrom(s => s.Bus.SeatCount)
@@ -72,9 +72,6 @@ public class DataMapping : Profile
         CreateMap<Payment, PaymentDTO>()
         .ForMember(d => d.PaymentDate,
                     s => s.MapFrom(s => s.PaymentDate.ToString("HH:mm:ss dd/MM/yyyy"))
-        )
-        .ForMember(d => d.BusTickCode,
-                    s => s.MapFrom(s => s.Booking.TicketCode)
         );
 
         //Phần anh Hải
@@ -95,16 +92,14 @@ public class DataMapping : Profile
             .ForMember(
                 d => d.DateEnd,
                 s => s.MapFrom(src => src.DateEnd.ToString("HH:mm:ss dd/MM/yyyy"))
-            );
-
-        CreateMap<TripDTO, Trip>()
-            .ForMember(
-                d => d.DateStart,
-                s => s.MapFrom(dto => DateTime.ParseExact(dto.DateStart, "HH:mm:ss dd/MM/yyyy", CultureInfo.InvariantCulture))
             )
             .ForMember(
-                d => d.DateEnd,
-                s => s.MapFrom(dto => DateTime.ParseExact(dto.DateEnd, "HH:mm:ss dd/MM/yyyy", CultureInfo.InvariantCulture))
+                d => d.DepartureLocationName,
+                o => o.MapFrom(s => s.DepartureLocation.Name) // Lấy tên từ bảng Location cho điểm xuất phát
+            )
+            .ForMember(
+                d => d.ArrivalLocationName,
+                o => o.MapFrom(s => s.ArrivalLocation.Name) // Lấy tên từ bảng Location cho điểm đến
             );
 
     }

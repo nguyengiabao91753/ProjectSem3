@@ -10,6 +10,5 @@ public class PaymentDTO
 
     public decimal Amount { get; set; }
 
-    public string? BusTickCode { get; set; }
 
 }
