@@ -50,14 +50,14 @@ public class PaymentController : ControllerBase
         }
     }
 
-    [HttpPost("create-paypal")]
-    public IActionResult CreatePaypal([FromBody] IEnumerable<BookingDTO> dto)
+    [HttpPost("create-paypal/{bookingId}")]
+    public IActionResult CreatePaypal(int bookingId)
     {
         try
         {
             var baseUrl = HttpContext.Request.Host.Value;
 
-            var payment = paypalService.CreatePayment(dto, baseUrl);
+            var payment = paypalService.CreatePayment(bookingId, baseUrl);
 
             return Ok(payment);
         }
@@ -67,16 +67,21 @@ public class PaymentController : ControllerBase
         }
     }
 
-    [HttpPost("execute-paypal")]
-    public IActionResult ExecutePaypal([FromBody] ExecutePaymentDto dto)
+    [HttpPost("execute-paypal/{bookingId}")]
+    public IActionResult ExecutePaypal(int bookingId, [FromBody] ExecutePaymentDto dto)
     {
         try
         {
-            var payment = paypalService.ExecutePayment(dto);
+            var executedPayment = paypalService.ExecutePayment(bookingId, dto);
 
-            if (payment != null)
+            if (executedPayment != null)
             {
-                return Ok(payment);
+                var payerName = $"{executedPayment.payer.payer_info.first_name} {executedPayment.payer.payer_info.last_name}";
+                return Ok(new
+                {
+                    payment = executedPayment,
+                    payer_given_name = payerName
+                });
             }
             else
             {

@@ -48,6 +48,9 @@ public class DataMapping : Profile
            d => d.BookingDate,
            s => s.MapFrom(b => DateTime.ParseExact(b.BookingDate, "HH:mm:ss dd/MM/yyyy", CultureInfo.InvariantCulture))
            );
+
+        CreateMap<BookingDetail, BookingDetailDTO>();
+        CreateMap<BookingDetailDTO, BookingDetail>();
         //Phần anh Duy
         CreateMap<BusType, BusTypeDTO>().ReverseMap();
 
@@ -100,6 +103,16 @@ public class DataMapping : Profile
             .ForMember(
                 d => d.ArrivalLocationName,
                 o => o.MapFrom(s => s.ArrivalLocation.Name) // Lấy tên từ bảng Location cho điểm đến
+            );
+
+        CreateMap<TripDTO, Trip>()
+            .ForMember(
+                d => d.DateStart,
+                s => s.MapFrom(dto => DateTime.ParseExact(dto.DateStart, "HH:mm:ss dd/MM/yyyy", CultureInfo.InvariantCulture))
+            )
+            .ForMember(
+                d => d.DateEnd,
+                s => s.MapFrom(dto => DateTime.ParseExact(dto.DateEnd, "HH:mm:ss dd/MM/yyyy", CultureInfo.InvariantCulture))
             );
 
     }

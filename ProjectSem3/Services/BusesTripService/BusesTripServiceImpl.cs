@@ -58,9 +58,9 @@ public class BusesTripServiceImpl : BusesTripService
         return mapper.Map<List<BusesTripDTO>>(db.BusesTrips.Where(b=>b.Status!=0).OrderByDescending(b=>b.BusTripId).ToList());
     }
 
-    public BusesSeatDTO GetById(int id)
+    public BusesTripDTO GetById(int id)
     {
-       return mapper.Map<BusesSeatDTO>(db.BusesTrips.Find(id));
+       return mapper.Map<BusesTripDTO>(db.BusesTrips.Find(id));
     }
 
     public bool Update(BusesTripDTO busesTripDTO)

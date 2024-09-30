@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.EntityFrameworkCore;
 using ProjectSem3.DTOs;
 using ProjectSem3.Models;
 
@@ -31,13 +32,14 @@ public class BookingServiceImpl : BookingService
         return id;
     }
 
-    public bool Create(BookingDTO bookingDTO, List<BookingDetail> bookingDetails)
+    public bool Create(BookingDTO bookingDTO, List<BookingDetailDTO> bookingDetailsdto)
     {
         try
         {
             var book = mapper.Map<Booking>(bookingDTO);
+            var bookingDetails = mapper.Map<List<BookingDetail>>(bookingDetailsdto);
             var total = bookingDetails.Sum(d => d.PriceAfterDiscount);
-            book.Total = (decimal)total;
+            book.Total = total;
             book.BookingDate = DateTime.Now;
             db.Bookings.Add(book);
             if (db.SaveChanges() > 0)
@@ -57,6 +59,7 @@ public class BookingServiceImpl : BookingService
                             db.BusesSeats.Update(seat);
 
                             bookingDetails[i].BookingId = book.BookingId;
+                            bookingDetails[i].TicketStatus = 1;
                             db.BookingDetails.Add(bookingDetails[i]);
 
                             if (db.SaveChanges() > 0)
@@ -150,5 +153,11 @@ public class BookingServiceImpl : BookingService
         {
             return false;
         }
+    }
+
+    public BookingDTO GetBookingById(int bookingId)
+    {
+        var booking = db.Bookings.Include(b => b.BookingDetails).FirstOrDefault(b => b.BookingId == bookingId);
+        return mapper.Map<BookingDTO>(booking);
     }
 }
