@@ -62,8 +62,4 @@ public class BookingController : Controller
     }
 }
 
-public class BookingRequest
-{
-    public BookingDTO BookingDTO { get; set; }
-    public List<BookingDetailDTO> BookingDetailDTOs { get; set; }
-}
+
