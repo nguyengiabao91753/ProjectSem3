@@ -21,21 +21,10 @@ public class PaypalService
         bookingServiceImpl = _bookingServiceImpl;
     }
 
-    public PayPal.Api.Payment CreatePayment(int bookingId, string baseUrl)
+    public PayPal.Api.Payment CreatePayment(BookingRequest bookingRequest, string baseUrl)
     {
-        var booking = bookingServiceImpl.GetBookingById(bookingId);
-        if (booking == null)
-        {
-            throw new Exception("Booking not found");
-        }
-
-        var bookingDetails = db.BookingDetails
-        .Where(bd => bd.BookingId == bookingId)
-        .Select(bd => new BookingDetailDTO
-        {
-            TicketCode = bd.TicketCode,
-            PriceAfterDiscount = bd.PriceAfterDiscount
-        }).ToList();
+        var bookingDetails = bookingRequest.BookingDetailDTOs;
+        var booking = bookingRequest.BookingDTO;
 
         var subtotal = bookingDetails.Sum(x => x.PriceAfterDiscount ?? 0);
 
@@ -87,7 +76,7 @@ public class PaypalService
             redirect_urls = new()
             {
                 cancel_url = "/",
-                return_url = $"/{baseUrl}/api/Payment/execute-paypal?bookingId={bookingId}"
+                return_url = $"/{baseUrl}/api/Payment/execute-paypal"
             }
         };
 
@@ -95,7 +84,7 @@ public class PaypalService
 
     }
 
-    public PayPal.Api.Payment ExecutePayment(int bookingId, ExecutePaymentDto dto)
+    public PayPal.Api.Payment ExecutePayment(BookingRequest bookingRequest, ExecutePaymentDto dto)
     {
         var paymentExecution = new PaymentExecution { payer_id = dto.PayerId };
         var payment = new PayPal.Api.Payment { id = dto.PaymentId };
@@ -103,29 +92,25 @@ public class PaypalService
         try
         {
             var executedPayment = payment.Execute(GetContext(), paymentExecution);
-            var booking = bookingServiceImpl.GetBookingById(bookingId);
-            var bookingDetails = db.BookingDetails
-            .Where(bd => bd.BookingId == bookingId)
-            .Select(bd => new BookingDetailDTO
-            {
-                TicketCode = bd.TicketCode,
-                PriceAfterDiscount = bd.PriceAfterDiscount
-            }).ToList();
+            var bookingDetails = bookingRequest.BookingDetailDTOs;
+            var booking = bookingRequest.BookingDTO;
 
             if (executedPayment.state.ToLower() == "approved")
             {
-                var paymentModel = new Models.Payment
-                {
-                    BookingId = booking.BookingId,
-                    PaymentDate = DateTime.Now,
-                    Amount = bookingDetails.Sum(x => (decimal)x.PriceAfterDiscount),
-                    PaymentMethod = "Paypal"
-                };
+                //var paymentModel = new Models.Payment
+                //{
+                //    BookingId = booking.BookingId,
+                //    PaymentDate = DateTime.Now,
+                //    Amount = bookingDetails.Sum(x => (decimal)x.PriceAfterDiscount),
+                //    PaymentMethod = "Paypal"
+                //};
 
-                db.Payments.Add(paymentModel);
-                var result = db.SaveChanges();
+                var result = bookingServiceImpl.Create(booking, bookingDetails, "Paypal");
 
-                if (result > 0)
+                //db.Payments.Add(paymentModel);
+                //var result = db.SaveChanges();
+
+                if (result)
                 {
                     return executedPayment;
                 }

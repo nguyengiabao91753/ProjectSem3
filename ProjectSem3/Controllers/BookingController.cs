@@ -35,23 +35,28 @@ public class BookingController : Controller
         }
     }
 
-    [HttpGet("get-by-booking-id/{id}")]
-    public IActionResult GetByBookingId(int id)
+    [Consumes("application/json")]
+    [Produces("application/json")]
+    [HttpGet("getall")]
+    public IActionResult Getall()
     {
         try
         {
-            var result = bookingService.GetBookingById(id);
-            return Ok(result);
+            var booking = bookingService.GetAll();
+            var details = bookingService.GetAllDetail();
+
+            return Ok(new
+            {
+                booking = booking,
+                details = details
+            }
+            );
+
+            throw new Exception();
         }
         catch (Exception ex)
         {
             return BadRequest(ex.Message);
         }
     }
-}
-
-public class BookingRequest
-{
-    public BookingDTO BookingDTO { get; set; }
-    public List<BookingDetailDTO> BookingDetailDTOs { get; set; }
 }

@@ -50,14 +50,14 @@ public class PaymentController : ControllerBase
         }
     }
 
-    [HttpPost("create-paypal/{bookingId}")]
-    public IActionResult CreatePaypal(int bookingId)
+    [HttpPost("create-paypal")]
+    public IActionResult CreatePaypal([FromBody] BookingRequest bookingRequest)
     {
         try
         {
             var baseUrl = HttpContext.Request.Host.Value;
 
-            var payment = paypalService.CreatePayment(bookingId, baseUrl);
+            var payment = paypalService.CreatePayment(bookingRequest, baseUrl);
 
             return Ok(payment);
         }
@@ -67,12 +67,15 @@ public class PaymentController : ControllerBase
         }
     }
 
-    [HttpPost("execute-paypal/{bookingId}")]
-    public IActionResult ExecutePaypal(int bookingId, [FromBody] ExecutePaymentDto dto)
+    [HttpPost("execute-paypal")]
+    public IActionResult ExecutePaypal([FromBody] BookingExecute bookingExecute)
     {
         try
         {
-            var executedPayment = paypalService.ExecutePayment(bookingId, dto);
+            BookingRequest bookingRequest = new BookingRequest();
+            bookingRequest.BookingDetailDTOs = bookingExecute.BookingDetailDTOs;
+            bookingRequest.BookingDTO = bookingExecute.BookingDTO;
+            var executedPayment = paypalService.ExecutePayment(bookingRequest, bookingExecute.dto);
 
             if (executedPayment != null)
             {
@@ -93,4 +96,12 @@ public class PaymentController : ControllerBase
             return BadRequest(ex.Message);
         }
     }
+}
+
+
+public class BookingExecute
+{
+    public BookingDTO BookingDTO { get; set; }
+    public List<BookingDetailDTO> BookingDetailDTOs { get; set; }
+    public ExecutePaymentDto dto { get; set; }
 }
