@@ -20,7 +20,7 @@ public class BookingDTO
     public int? BusTripId { get; set; }
     public string? BookingDate { get; set; }
 
-    public decimal? Total { get; set; }
+    public decimal Total { get; set; }
     public byte? PaymentStatus { get; set; }
 
     

@@ -20,7 +20,7 @@ public class BookingController : Controller
     {
         try
         {
-            bool result = bookingService.Create(bookingRequest.BookingDTO, bookingRequest.BookingDetailDTOs);
+            bool result = bookingService.Create(bookingRequest.BookingDTO, bookingRequest.BookingDetailDTOs, "Paypal");
 
             return Ok(new
             {
