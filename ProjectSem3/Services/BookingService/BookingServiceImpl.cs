@@ -27,9 +27,9 @@ public class BookingServiceImpl : BookingService
 
         for (int i = 0; i < 5; i++)
         {
-            id += chars[random.Next(chars.Length)] + plusId;
+            id += chars[random.Next(chars.Length)];
         }
-        return id;
+        return id + plusId;
     }
 
     public bool Create(BookingDTO bookingDTO, List<BookingDetailDTO> bookingDetailsdto)
@@ -79,8 +79,9 @@ public class BookingServiceImpl : BookingService
                         bustrip.Status = 2;
                         db.BusesTrips.Update(bustrip);
 
-                    }
                     return db.SaveChanges()>0;
+                    }
+                    return true;
 
                 }
             }
@@ -154,4 +155,26 @@ public class BookingServiceImpl : BookingService
             return false;
         }
     }
+
+    public List<BookingDTO> GetAll()
+    {
+       return mapper.Map<List<BookingDTO>>(db.Bookings.OrderByDescending(b=>b.BookingId).ToList());
+    }
+
+    public List<BookingDetailDTO> GetAllDetail()
+    {
+       return mapper.Map<List<BookingDetailDTO>>(db.BookingDetails.ToList());
+    }
+
+    public List<BookingDTO> GetAllByUserId(int id)
+    {
+        return mapper.Map<List<BookingDTO>>(db.Bookings.Where(b=>b.UserId==id).OrderByDescending(b => b.BookingId).ToList());
+    }
+
+    public List<BookingDetailDTO> GetDetailByBooking(int id)
+    {
+        return mapper.Map<List<BookingDetailDTO>>(db.BookingDetails.Where(d => d.BookingId == id).ToList());
+    }
+
+
 }

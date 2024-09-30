@@ -10,4 +10,11 @@ public interface BookingService
     public bool Update(BookingDTO bookingDTO);
 
     public bool Cancel(BookingDTO bookingDTO);
+
+    public List<BookingDTO> GetAll();
+
+    public List<BookingDTO> GetAllByUserId(int id);
+
+    public List<BookingDetailDTO> GetDetailByBooking(int id);
+    public List<BookingDetailDTO> GetAllDetail();
 }

@@ -35,6 +35,31 @@ public class BookingController : Controller
             return BadRequest(ex.Message);
         }
     }
+
+    [Consumes("application/json")]
+    [Produces("application/json")]
+    [HttpGet("getall")]
+    public IActionResult Getall()
+    {
+        try
+        {
+            var booking = bookingService.GetAll();
+            var details = bookingService.GetAllDetail();
+
+            return Ok(new
+            {
+                booking = booking,
+                details = details
+            }
+            );
+
+            throw new Exception();
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(ex.Message);
+        }
+    }
 }
 
 public class BookingRequest
