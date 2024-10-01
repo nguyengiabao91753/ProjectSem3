@@ -12,7 +12,7 @@ public partial class BookingDetail
 
     public int? AgeGroupId { get; set; }
 
-    public decimal? PriceAfterDiscount { get; set; }
+    public decimal PriceAfterDiscount { get; set; }
 
     public string TicketCode { get; set; } = null!;
 

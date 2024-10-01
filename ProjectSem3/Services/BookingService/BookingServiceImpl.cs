@@ -31,7 +31,7 @@ public class BookingServiceImpl : BookingService
         return id + plusId;
     }
 
-    public bool Create(BookingDTO bookingDTO, List<BookingDetailDTO> bookingDetailsdto)
+    public bool Create(BookingDTO bookingDTO, List<BookingDetailDTO> bookingDetailsdto, string paymentMethod)
     {
         try
         {
@@ -78,9 +78,16 @@ public class BookingServiceImpl : BookingService
                         bustrip.Status = 2;
                         db.BusesTrips.Update(bustrip);
 
-                        return db.SaveChanges() > 0;
+
                     }
-                    return true;
+                    var payment = new Models.Payment();
+                    payment.BookingId = book.BookingId;
+                    payment.PaymentDate = DateTime.Now;
+                    payment.Amount = book.Total;
+                    payment.PaymentMethod = paymentMethod;
+                    db.Payments.Add(payment);
+
+                    return db.SaveChanges() > 0;
 
                 }
             }
