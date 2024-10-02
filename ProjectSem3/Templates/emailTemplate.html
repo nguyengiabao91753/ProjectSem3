@@ -1,0 +1,76 @@
+﻿<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Booking Confirmation</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: auto;
+            background-color: #ffffff;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            color: #4CAF50;
+            text-align: center;
+        }
+
+        hr {
+            border: none;
+            height: 1px;
+            background-color: #4CAF50;
+            margin-bottom: 20px;
+        }
+
+        p {
+            font-size: 16px;
+            color: #333;
+        }
+
+        .qr-code {
+            text-align: center;
+            margin: 20px 0;
+        }
+
+            .qr-code img {
+                width: 200px;
+                height: 200px;
+            }
+
+        .footer {
+            font-size: 14px;
+            color: #888;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Congratulations on your successful ticket booking!</h1>
+        <hr />
+        <p><strong>Trip:</strong> {{DepartureLocationName}} - {{ArrivalLocationName}}</p>
+        <p><strong>Date Start:</strong> {{DateStart}}</p>
+        <p><strong>Date End:</strong> {{DateEnd}}</p>
+        <p><strong>Full Name:</strong> {{FullName}}</p>
+        <p><strong>Bus:</strong> {{BusTypeName}} - {{LicensePlate}}</p>
+        <p><strong>Seat:</strong> {{SeatName}}</p>
+        <p><strong>TicketCode:</strong> {{TicketCode}}</p>
+        <p><strong>Booking Date:</strong> {{BookingDate}}</p>
+        <div class="qr-code">
+            <img src="{{QRCodePath}}" alt="QR Code" />
+        </div>
+        <p class="footer">Please present this QR code upon arrival.</p>
+    </div>
+</body>
+</html>

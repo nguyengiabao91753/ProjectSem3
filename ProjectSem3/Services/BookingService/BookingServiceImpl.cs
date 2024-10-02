@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using ProjectSem3.DTOs;
+using ProjectSem3.Helpers;
 using ProjectSem3.Models;
 
 namespace ProjectSem3.Services.BookingService;
@@ -8,14 +9,17 @@ public class BookingServiceImpl : BookingService
 {
     private DatabaseContext db;
     private IMapper mapper;
+    private IConfiguration configuration;
     public BookingServiceImpl(
         DatabaseContext databaseContext,
-        IMapper mapper
+        IMapper mapper,
+        IConfiguration configuration
 
         )
     {
         db = databaseContext;
         this.mapper = mapper;
+        this.configuration = configuration;
     }
 
     public string GenerateTicketCode(int plusId)
@@ -78,7 +82,6 @@ public class BookingServiceImpl : BookingService
                         bustrip.Status = 2;
                         db.BusesTrips.Update(bustrip);
 
-
                     }
                     var payment = new Models.Payment();
                     payment.BookingId = book.BookingId;
@@ -87,7 +90,13 @@ public class BookingServiceImpl : BookingService
                     payment.PaymentMethod = paymentMethod;
                     db.Payments.Add(payment);
 
-                    return db.SaveChanges() > 0;
+                    if (db.SaveChanges() > 0)
+                    {
+                        SenMailwithQRCodeHelper senMailwithQRCode = new SenMailwithQRCodeHelper(configuration);
+                        senMailwithQRCode.SenMailwithQRCode(book, bookingDetails);
+                        return true;
+
+                    }
 
                 }
             }
