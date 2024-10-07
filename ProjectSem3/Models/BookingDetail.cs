@@ -4,7 +4,7 @@ public partial class BookingDetail
 {
     public int BookingDetailId { get; set; }
 
-    public int? BookingId { get; set; }
+    public int BookingId { get; set; }
 
     public int? SeatId { get; set; }
 

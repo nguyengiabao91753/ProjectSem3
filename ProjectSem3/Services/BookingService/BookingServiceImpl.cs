@@ -88,6 +88,9 @@ public class BookingServiceImpl : BookingService
                     payment.PaymentDate = DateTime.Now;
                     payment.Amount = book.Total;
                     payment.PaymentMethod = paymentMethod;
+                    book.PaymentStatus = 1;
+
+                    db.Bookings.Update(book);
                     db.Payments.Add(payment);
 
                     if (db.SaveChanges() > 0)
@@ -191,5 +194,36 @@ public class BookingServiceImpl : BookingService
         return mapper.Map<List<BookingDetailDTO>>(db.BookingDetails.Where(d => d.BookingId == id).ToList());
     }
 
+    public BookingDetailDTO GetBookingDetailByTicketCode(string ticketCode)
+    {
+        var detail = mapper.Map<BookingDetailDTO>(db.BookingDetails.Where(d=>d.TicketCode == ticketCode).FirstOrDefault());
+        return detail;
+    }
 
+    public BookingDTO GetBookingById(int id)
+    {
+        var booking = mapper.Map<BookingDTO>(db.Bookings.Find(id));
+        return booking;
+    }
+
+    public BookingDetail getBookingDetailByTicketCode(string ticketCode)
+    {
+        var booking = db.BookingDetails.Where(d => d.TicketCode == ticketCode).FirstOrDefault();
+        return booking;
+    }
+
+    public Booking getBookingById(int id)
+    {
+        var booking = db.Bookings.Find(id);
+        return booking;
+    }
+
+    public bool UseTicket(string ticketCode)
+    {
+       
+        var detail = db.BookingDetails.Where(d => d.TicketCode == ticketCode).FirstOrDefault();
+        detail.TicketStatus = 0;
+        db.BookingDetails.Update(detail);
+        return db.SaveChanges() > 0;
+    }
 }

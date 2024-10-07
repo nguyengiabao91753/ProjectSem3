@@ -37,8 +37,8 @@ public class EmailHelper
             return emailTemplate
                 .Replace("{{DepartureLocationName}}", booking.BusTrip.Trip.DepartureLocation.Name)
                 .Replace("{{ArrivalLocationName}}", booking.BusTrip.Trip.ArrivalLocation.Name)
-                .Replace("{{DateStart}}", booking.BusTrip.Trip.DateStart.ToString("dd/MM/yyyy"))
-                .Replace("{{DateEnd}}", booking.BusTrip.Trip.DateEnd.ToString("dd/MM/yyyy"))
+                .Replace("{{DateStart}}", booking.BusTrip.Trip.DateStart.ToString("HH:mm:ss dd/MM/yyyy"))
+                .Replace("{{DateEnd}}", booking.BusTrip.Trip.DateEnd.ToString("HH:mm:ss dd/MM/yyyy"))
                 .Replace("{{FullName}}", booking.FullName)
                 .Replace("{{BusTypeName}}", booking.BusTrip.Bus.BusType.Name)
                 .Replace("{{LicensePlate}}", booking.BusTrip.Bus.LicensePlate)

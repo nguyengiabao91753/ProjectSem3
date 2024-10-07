@@ -25,6 +25,7 @@ public class PaypalService
     {
         var bookingDetails = bookingRequest.BookingDetailDTOs;
         var booking = bookingRequest.BookingDTO;
+        var quantityticket = bookingDetails.Count();
 
         var subtotal = bookingDetails.Sum(x => x.PriceAfterDiscount);
 
@@ -34,7 +35,7 @@ public class PaypalService
             {
                 return new Item
                 {
-                    name = x.TicketCode,
+                    name = "Seat " + x.SeatName,
                     currency = "USD",
                     price = (x.PriceAfterDiscount).ToString("F2"),
                     quantity = "1"
