@@ -48,6 +48,9 @@ public class DataMapping : Profile
            d => d.BookingDate,
            s => s.MapFrom(b => DateTime.ParseExact(b.BookingDate, "HH:mm:ss dd/MM/yyyy", CultureInfo.InvariantCulture))
            );
+
+        CreateMap<BookingDetail, BookingDetailDTO>();
+        CreateMap<BookingDetailDTO, BookingDetail>();
         //Phần anh Duy
         CreateMap<BusType, BusTypeDTO>().ReverseMap();
 
@@ -93,7 +96,6 @@ public class DataMapping : Profile
         //Phần anh Hải
         CreateMap<Level, LevelDTO>();
         CreateMap<LevelDTO, Level>();
-
         CreateMap<User, UserDTO>().ForMember(
             //d == destination
             d => d.CreatedAt,
@@ -104,18 +106,13 @@ public class DataMapping : Profile
             d => d.BirthDate,
             //s == source
             s => s.MapFrom(s => s.BirthDate.ToString("dd/MM/yyyy"))); 
-
         CreateMap<UserDTO, User>().ForMember(
             d => d.CreatedAt,
             s => s.MapFrom(s => DateTime.ParseExact(s.CreatedAt, "dd/MM/yyyy", CultureInfo.InvariantCulture))
             ).ForMember(
             d => d.BirthDate,
-            s => s.MapFrom(s => DateTime.ParseExact(s.BirthDate, "dd/MM/yyyy", CultureInfo.InvariantCulture))
-            );
-        //s => s.MapFrom(s => DateOnly.ParseExact(s.BirthDate, "dd/MM/yyyy", CultureInfo.InvariantCulture))
-
+            s => s.MapFrom(s => DateTime.ParseExact(s.BirthDate, "dd/MM/yyyy", CultureInfo.InvariantCulture)));
         CreateMap<Account, AccountDTO>();
-
         CreateMap<AccountUser, AccountUserDTO>().ForMember(
             //d == destination
             d => d.CreatedAt,
@@ -128,27 +125,26 @@ public class DataMapping : Profile
             s => s.MapFrom(s => s.BirthDate.ToString("dd/MM/yyyy")));
         CreateMap<AccountUserDTO, AccountUser>();
         CreateMap<Account, AccountUserDTO>()
-    .ForMember(
-        d => d.UserId,
-        s => s.MapFrom(s => s.AccountId)
-    )
-    .ForMember(
-        d => d.Username,
-        s => s.MapFrom(s => s.Username)
-    )
-    .ForMember(
-        d => d.Password,
-        s => s.MapFrom(s => s.Password)
-    )
-    .ForMember(
-        d => d.Status,
-        s => s.MapFrom(s => s.Status)
-    )
-    .ForMember(
-        d => d.LevelId,
-        s => s.MapFrom(s => s.LevelId)
-    );
-
+        .ForMember(
+            d => d.UserId,
+            s => s.MapFrom(s => s.AccountId)
+        )
+        .ForMember(
+            d => d.Username,
+            s => s.MapFrom(s => s.Username)
+        )
+        .ForMember(
+            d => d.Password,
+            s => s.MapFrom(s => s.Password)
+        )
+        .ForMember(
+            d => d.Status,
+            s => s.MapFrom(s => s.Status)
+        )
+        .ForMember(
+            d => d.LevelId,
+            s => s.MapFrom(s => s.LevelId)
+        );
         CreateMap<AccountUserDTO, Account>()
             .ForMember(
             d => d.AccountId,
@@ -184,8 +180,7 @@ public class DataMapping : Profile
             s => s.MapFrom(s => s.Address)
             ).ForMember(
             d => d.CreatedAt,
-            s => s.MapFrom(s => DateTime.ParseExact(s.CreatedAt, "HH:mm:ss dd/MM/yyyy", CultureInfo.InvariantCulture))
-            );
+            s => s.MapFrom(s => DateTime.ParseExact(s.CreatedAt, "HH:mm:ss dd/MM/yyyy", CultureInfo.InvariantCulture)));
 
 
         //Phần anh Ý

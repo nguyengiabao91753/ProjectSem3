@@ -172,7 +172,7 @@ GO
 
 
 -- Create Payments table
-CREATE TABLE Payments (
+CREATE TABLE Payments(
     PaymentID INT PRIMARY KEY IDENTITY(1,1),
     BookingID INT FOREIGN KEY REFERENCES Bookings(BookingID),
     PaymentDate DATETIME NOT NULL,

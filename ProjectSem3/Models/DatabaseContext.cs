@@ -44,9 +44,8 @@ public partial class DatabaseContext : DbContext
     public virtual DbSet<User> Users { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-
-
         => optionsBuilder.UseSqlServer("Server=Eragon\\SQLEXPRESS;Database=Bus_Ticket;user id=hai;password=123;trusted_connection=true;encrypt=false");
+
 
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)

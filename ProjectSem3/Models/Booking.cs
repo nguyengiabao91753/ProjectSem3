@@ -19,7 +19,7 @@ public partial class Booking
 
     public DateTime BookingDate { get; set; }
 
-    public decimal Total { get; set; }
+    public decimal? Total { get; set; }
 
     public byte? PaymentStatus { get; set; }
 

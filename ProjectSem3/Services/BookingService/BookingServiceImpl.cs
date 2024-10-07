@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using ProjectSem3.DTOs;
 using ProjectSem3.Models;
+using System.Collections.Generic;
 
 namespace ProjectSem3.Services.BookingService;
 
@@ -10,7 +11,7 @@ public class BookingServiceImpl : BookingService
     private IMapper mapper;
     public BookingServiceImpl(
         DatabaseContext databaseContext,
-        IMapper mappern
+        IMapper mapper
 
         )
     {
@@ -21,7 +22,7 @@ public class BookingServiceImpl : BookingService
     public string GenerateTicketCode(int plusId)
     {
         var id = "";
-        var chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+        var chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
         var random = new Random();
 
         for (int i = 0; i < 5; i++)
@@ -31,13 +32,17 @@ public class BookingServiceImpl : BookingService
         return id;
     }
 
-    public bool Create(BookingDTO bookingDTO)
+    public bool Create(BookingDTO bookingDTO, List<BookingDetailDTO> bookingDetailsdto)
     {
         try
         {
             var book = mapper.Map<Booking>(bookingDTO);
-            var bustrip = db.BusesTrips.FirstOrDefault(b => b.BusTripId == book.BusTripId);
-            if (bustrip != null)
+            var bookingDetails = mapper.Map<List<BookingDetail>>(bookingDetailsdto);
+            var total = bookingDetails.Sum(d => d.PriceAfterDiscount);
+            book.Total = total;
+            book.BookingDate = DateTime.Now;
+            db.Bookings.Add(book);
+            if (db.SaveChanges() > 0)
             {
                 //var seat = db.BusesSeats.FirstOrDefault(s => s.BusId == bustrip.BusId && s.SeatId == book.SeatId);
 
@@ -61,40 +66,50 @@ public class BookingServiceImpl : BookingService
                 //        db.Bookings.Update(book);
                 //        return db.SaveChanges() > 0;
                 //    }
-
-
-
                 //}
                 /*                var seat = db.BusesSeats.FirstOrDefault(s => s.BusId == bustrip.BusId && s.SeatId == book.SeatId);*/
+                var bustrip = db.BusesTrips.SingleOrDefault(b => b.BusTripId == book.BusTripId);
 
-                /*                if (seat != null)
-                                {
-                                    seat.Status = 0;
-                                    db.BusesSeats.Update(seat);
-                                    var countseat = db.BusesSeats.Count(s => s.BusId == bustrip.BusId && s.Status == 1);
-                                    if (countseat == 0)
-                                    {
-                                        bustrip.Status = 2;
-                                        db.BusesTrips.Update(bustrip);
+                if (bustrip != null)
+                {
+                    for (int i = 0; i < bookingDetails.Count; i++)
+                    {
 
-                                    }
-                                    book.BookingDate = DateTime.Now;
+                        var seat = db.BusesSeats.FirstOrDefault(s => s.BusId == bustrip.BusId && s.SeatId == bookingDetails[i].SeatId);
 
-                                    db.Bookings.Add(book);
-                                    if (db.SaveChanges() > 0)
-                                    {
-                *//*                        book.TicketCode = GenerateTicketCode(book.BookingId);
-                                        db.Bookings.Update(book);*//*
-                                        return db.SaveChanges() > 0;
-                                    }
+                        if (seat != null)
+                        {
+                            seat.Status = 0;
+                            db.BusesSeats.Update(seat);
+ 
+                            bookingDetails[i].BookingId = book.BookingId;
+                            bookingDetails[i].TicketStatus = 1;
+                            db.BookingDetails.Add(bookingDetails[i]);
+
+                            if (db.SaveChanges() > 0)
+                            {
+                                bookingDetails[i].TicketCode = GenerateTicketCode(bookingDetails[i].BookingDetailId);
+                                db.BookingDetails.Update(bookingDetails[i]);
+                                db.SaveChanges();
+                            }
 
 
 
-                                }*/
+                        }
+                    }
+                    var countseat = db.BusesSeats.Count(s => s.BusId == bustrip.BusId && s.Status == 1);
+                    if (countseat == 0)
+                    {
+                        bustrip.Status = 2;
+                        db.BusesTrips.Update(bustrip);
 
+                    }
+                    return db.SaveChanges()>0;
+
+                }
             }
 
-            return false;
+                    return false;
 
         }
         catch (Exception ex)
@@ -123,7 +138,8 @@ public class BookingServiceImpl : BookingService
         {
             var book = mapper.Map<Booking>(bookingDTO);
             var bustrip = db.BusesTrips.FirstOrDefault(b => b.BusTripId == book.BusTripId);
-            if (bustrip != null)
+            var bookingdetails = db.BookingDetails.Where(b=>b.BookingId == book.BookingId).ToList();
+            if (bustrip != null && bookingdetails != null)
             {
                 //var seat = db.BusesSeats.FirstOrDefault(s => s.BusId == bustrip.BusId && s.SeatId == book.SeatId);
                 //db.BusesSeats.Update(seat);
@@ -155,13 +171,32 @@ public class BookingServiceImpl : BookingService
                                         bustrip.Status = 1;
                                         db.BusesTrips.Update(bustrip);
                                     }*/
+                for (int i = 0; i < bookingdetails.Count; i++)
+                {
 
-                /*                    book.TicketStatus = 2;
-                                    book.TicketCode = "";*/
-                db.Entry(book).State = Microsoft.EntityFrameworkCore.EntityState.Modified;
-                return db.SaveChanges() > 0;
-                /*
-                                }*/
+
+                    var seat = db.BusesSeats.SingleOrDefault(s => s.BusId == bustrip.BusId && s.SeatId == bookingdetails[i].SeatId);
+                   
+                    if (seat != null)
+                    {
+                        seat.Status = 1;
+                        db.BusesSeats.Update(seat);
+                       
+
+                        bookingdetails[i].TicketStatus = 2;
+                        bookingdetails[i].TicketCode = "";
+                        db.Entry(bookingdetails[i]).State = Microsoft.EntityFrameworkCore.EntityState.Modified;
+                        db.SaveChanges();
+
+                    }
+                }
+                var countseat = db.BusesSeats.Count(b => b.BusId == bustrip.BusId && b.Status == 1);
+                if (countseat != 0)
+                {
+                    bustrip.Status = 1;
+                    db.BusesTrips.Update(bustrip);
+                }
+                return db.SaveChanges() >0;
 
             }
 

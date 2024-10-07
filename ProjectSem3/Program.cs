@@ -17,6 +17,7 @@ using ProjectSem3.Services.PolicyService;
 using ProjectSem3.Services.TripService;
 using System.Text;
 using ProjectSem3.Services.BusesTripService;
+using ProjectSem3.Services.BookingService;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -68,7 +69,7 @@ builder.Services.AddScoped<AccountUserService, AccountUserServiceImpl>();
 
 builder.Services.AddScoped<TripService, TripServiceImpl>();
 builder.Services.AddScoped<LocationService, LocationServiceImpl>();
-
+builder.Services.AddScoped<BookingService, BookingServiceImpl>();
 
 builder.Services.AddScoped<BusTypeService, BusTypeServiceImpl>();
 builder.Services.AddScoped<BusService, BusServiceImpl>();
@@ -89,9 +90,10 @@ app.UseCors(builder => builder
 
 
 app.UseAuthentication(); //kích hoạt midddlewarre xác thực . Ví dụ, nó có thể đảm nhận việc kiểm tra xem người dùng đã đăng nhập chưa trước khi truy cập vào một trang hoặc tài nguyên cụ thể.
-
+// Validate the token
 
 app.UseAuthorization(); // kích hoạt middleware phân quyền. Ví dụ, nó có thể kiểm tra xem người dùng có quyền truy cập vào một trang hay tài nguyên cụ thể không dựa trên vai trò hoặc các yêu cầu quyền.
+// Check for user permissions/roles
 
 
 // Configure the HTTP request pipeline.

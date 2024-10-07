@@ -1,7 +1,11 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using ProjectSem3.DTOs;
+using ProjectSem3.Models;
 using ProjectSem3.Services.AccountService;
 using ProjectSem3.Services.AgeGroupService;
+using System.Globalization;
+using System.Security.Claims;
 
 namespace ProjectSem3.Controllers;
 [Route("api/accountUser")]
@@ -17,21 +21,25 @@ public class AccountUserController :Controller
         configuration = _configuration;
         webHostEnvironment = _webHostEnvironment;
     }
-    [Consumes("application/json")]
-    [Produces("application/json")]
+
     [HttpPost("login")]
     public IActionResult Login([FromBody] AccountUserDTO accountUserDTO)
     {
         var account = accountUserService.Login(accountUserDTO.Username, accountUserDTO.Password);
         if (account != null)
         {
-            var token = accountUserService.GenerateJSONWebToken(accountUserDTO.Username);
-            return Ok(new { token = token }); // Trả về token trong JSON
+            var token = accountUserService.GenerateJSONWebToken(accountUserDTO.Username, account.UserId);
+            return Ok(new
+            {
+                token = token,
+                userId = account.UserId,
+                email = account.Email,
+                levelId = account.LevelId,
+                status = account.Status
+            });
         }
         return Unauthorized(new { message = "Invalid credentials" });
     }
-
-
 
     [Consumes("application/json")]
     [Produces("application/json")]
@@ -44,16 +52,18 @@ public class AccountUserController :Controller
             {
                 return BadRequest(new { error = "invalid account data" });
             }
-            //kiểm tra xem username đã tồn tài hay chưa
+
+
+
             var existingAccount = accountUserService.FindByUsername(accountUserDTO.Username);   
             if (existingAccount != null)
             {
-                Console.WriteLine("Username already exists");
                 return BadRequest(new { error = "Username already exists" });
             }
+
+
             accountUserDTO.Password = BCrypt.Net.BCrypt.HashPassword(accountUserDTO.Password);
-            // gọi service để đăng ký tài khoản mới
-             bool result = accountUserService.CreateAccountUser(accountUserDTO);
+            bool result = accountUserService.CreateAccountUser(accountUserDTO);
 
                 if (result)
                 {
@@ -69,7 +79,6 @@ public class AccountUserController :Controller
           
          catch (Exception ex)
         {
-            // Thêm log chi tiết lỗi
             Console.WriteLine("Error during account creation: " + ex.Message);
             return StatusCode(500, new { error = "Error during registration", details = ex.Message
         });
@@ -115,30 +124,76 @@ public class AccountUserController :Controller
             return StatusCode(500, new { error = "Error during update", details = ex.Message });
         }
     }
+    [HttpPut("updateAccountUserToken")]
+    [Authorize]
+    public IActionResult UpdateAccountUserToken([FromBody] AccountUserDTO accountUserDTO)
+    {
+        // Lấy userId từ token
+        var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        if (string.IsNullOrEmpty(userIdClaim))
+        {
+            return Unauthorized(new { error = "User not found" });
+        }
 
+        int userId = int.Parse(userIdClaim);
 
-    //[Produces("application/json")]
-    //[HttpGet("getUserInfoByEmail/{email}")]
-    //public IActionResult GetUserInfoByEmail(string email)
-    //{
-    //    try
-    //    {
-    //        return Ok(accountUserService.get(email));
-    //    }
-    //    catch
-    //    {
+        // Kiểm tra xem userId trong token có khớp với userId được gửi lên không
+        if (userId != accountUserDTO.UserId)
+        {
+            return Unauthorized(new { error = "User ID mismatch" });
+        }
+        // Tạo một đối tượng DTO chỉ chứa các thông tin được phép cập nhật
+        var updateDTO = new AccountUserDTO
+        {
+            UserId = userId,
+            FullName = accountUserDTO.FullName,
+            Email = accountUserDTO.Email,
+            PhoneNumber = accountUserDTO.PhoneNumber,
+            BirthDate = accountUserDTO.BirthDate,
+            Address = accountUserDTO.Address,
+            Password = accountUserDTO.Password // Nếu cho phép thay đổi mật khẩu
+        };
+        // Thực hiện cập nhật thông tin người dùng
+        var result = accountUserService.UpdateAccountUser(accountUserDTO);
+        if (result)
+        {
+            return Ok(new { status = true, message = "Profile updated successfully" });
+        }
+        else
+        {
+            return BadRequest(new { status = false, message = "Failed to update profile" });
+        }
+    }
+    [HttpGet("getInfoByToken")]
+    [Authorize]
+    public IActionResult GetUserProfile()
+    {
+        var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
-    //        return BadRequest();
-    //    }
-    //}
+        if (string.IsNullOrEmpty(userIdClaim))
+        {
+            return Unauthorized(new { error = "User not found" });
+        }
+
+        int userId = int.Parse(userIdClaim);
+        var userInfo = accountUserService.GetInfoAccountById(userId);
+
+        if (userInfo == null)
+        {
+            return NotFound(new { error = "Account not found" });
+        }
+
+        return Ok(userInfo);
+    }
+
 
     [Produces("application/json")]
-    [HttpGet("getInfoByAccountId/{id}")]
-    public IActionResult GetInfoByAccountId(int id)
+    [HttpGet("getInfoAccountById/{id}")]
+    public IActionResult GetInfoAccountById(int id)
     {
         try
         {
-            var userInfo = accountUserService.GetInfoByAccountById(id);
+            var userInfo = accountUserService.GetInfoAccountById(id);
 
             return Ok(userInfo);
           
@@ -219,4 +274,7 @@ public class AccountUserController :Controller
         return result ? Ok(new { status = "Account set to active successfully" })
                       : BadRequest(new { error = "Failed to set account to active" });
     }
+
+   
+
 }

@@ -23,32 +23,15 @@ public class AccountUserServiceImpl(DatabaseContext db, IMapper mapper, IConfigu
 
         try
         {
-            //Kiểm tra xem username đã tồn tại hay chưa
             var existingAccount = db.Accounts.FirstOrDefault(a => a.Username == accountUserDTO.Username);
             if (existingAccount != null)
             {
-                //Username đã tòn tại
                 return false;
             }
-            //// Map accountUserDTO sang Account
-            //var account = mapper.Map<Account>(accountUserDTO);
-            //// Map accountUserDTO sang User, gán AccountId cho User
-            //var user = mapper.Map<User>(accountUserDTO);
-            //user.CreatedAt = DateTime.Now;
-            //db.Users.Add(user);
-            //if (db.SaveChanges()>0)
-            //{
-            //    account.AccountId = user.UserId;
-
-            //    db.Accounts.Add(account);
-
-            //    // Lưu thay đổi cho cả hai bảng
-            //    return db.SaveChanges() > 0;
-            //}
-            //return false;
 
             var user = mapper.Map<User>(accountUserDTO);
             user.CreatedAt = DateTime.Now;
+
             db.Users.Add(user);  
             db.SaveChanges();
 
@@ -56,20 +39,20 @@ public class AccountUserServiceImpl(DatabaseContext db, IMapper mapper, IConfigu
             account.AccountId = user.UserId;
             db.Accounts.Add(account);
             db.SaveChanges();
+
             transaction.Commit();
             return true;
         }
-            catch (Exception ex)
-            {
-            // Rollback nếu có lỗi
-            transaction.Rollback();
-            Console.WriteLine($"Error during account creation: {ex.Message}");
-            return false;
-            }
+        catch (Exception ex)
+        {
+        transaction.Rollback();
+        Console.WriteLine($"Error during account creation: {ex.Message}");
+        return false;
+        }
         
     }
 
-    public string GenerateJSONWebToken(string username)
+    public string GenerateJSONWebToken(string username, int userId)
     {
         var issuer = configuration["Jwt:Issuer"];
         var audience = configuration["Jwt:Audience"];
@@ -78,12 +61,12 @@ public class AccountUserServiceImpl(DatabaseContext db, IMapper mapper, IConfigu
         {
             Subject = new ClaimsIdentity(new[]
             {
-                new Claim(JwtRegisteredClaimNames.Name, username),
-
-            }),
+            new Claim(JwtRegisteredClaimNames.Name, username),
+            new Claim(ClaimTypes.NameIdentifier, userId.ToString())
+        }),
             Issuer = issuer,
             Audience = audience,
-            Expires = DateTime.UtcNow.AddMinutes(10),
+            Expires = DateTime.UtcNow.AddMinutes(60),
             SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha512)
         };
         var tokenHandler = new JwtSecurityTokenHandler();
@@ -91,10 +74,30 @@ public class AccountUserServiceImpl(DatabaseContext db, IMapper mapper, IConfigu
         return tokenHandler.WriteToken(token);
     }
 
-    public AccountUserDTO GetInfoByAccountById(int id)
+
+
+    public AccountUserDTO GetInfoAccountById(int id)
     {
-        return mapper.Map<AccountUserDTO>(db.Users.Find(id));
+        var account = db.Accounts
+            .Include(a => a.AccountNavigation)
+            .FirstOrDefault(a => a.AccountId == id);
+
+        if (account == null) return null;
+
+        return new AccountUserDTO
+        {
+            UserId = account.AccountNavigation.UserId,
+            Username = account.Username,
+            FullName = account.AccountNavigation.FullName,
+            Email = account.AccountNavigation.Email,
+            PhoneNumber = account.AccountNavigation.PhoneNumber,
+            BirthDate = account.AccountNavigation.BirthDate.ToString("dd-MM-yyyy"), // Ensure formatting here
+            Address = account.AccountNavigation.Address,
+            Status = account.Status,
+            LevelId = account.LevelId,
+        };
     }
+
 
     public bool UpdateAccountUser(AccountUserDTO accountUserDTO)
     {
@@ -143,6 +146,44 @@ public class AccountUserServiceImpl(DatabaseContext db, IMapper mapper, IConfigu
         }
     }
 
+    public bool UpdateUserProfile(AccountUserDTO accountUserDTO)
+    {
+        try
+        {
+            var user = db.Users.FirstOrDefault(u => u.UserId == accountUserDTO.UserId);
+            var account = db.Accounts.FirstOrDefault(a => a.AccountId == accountUserDTO.UserId);
+
+            if (user == null || account == null)
+            {
+                return false;
+            }
+
+            // Không cho phép cập nhật Username, Status, LevelId
+
+            // Cập nhật thông tin người dùng (User)
+            user.FullName = accountUserDTO.FullName;
+            user.BirthDate = DateTime.ParseExact(accountUserDTO.BirthDate, "dd-MM-yyyy", CultureInfo.InvariantCulture);
+            user.Email = accountUserDTO.Email;
+            user.PhoneNumber = accountUserDTO.PhoneNumber;
+            user.Address = accountUserDTO.Address;
+
+            // Cập nhật mật khẩu nếu có
+            if (!string.IsNullOrEmpty(accountUserDTO.Password))
+            {
+                account.Password = BCrypt.Net.BCrypt.HashPassword(accountUserDTO.Password);
+                db.Entry(account).State = EntityState.Modified;
+            }
+
+            db.Entry(user).State = EntityState.Modified;
+
+            return db.SaveChanges() > 0;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error during profile update: {ex.Message}");
+            return false;
+        }
+    }
 
 
     public List<AccountUserDTO> GetAllAccountUserInfo()
@@ -188,6 +229,7 @@ public class AccountUserServiceImpl(DatabaseContext db, IMapper mapper, IConfigu
         // Nếu tài khoản và mật khẩu hợp lệ, trả về đối tượng AccountDTO
         return mapper.Map<AccountUserDTO>(account);
     }
+
 
 
     public bool DeleteAccountUser(int id)
