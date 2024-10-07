@@ -12,5 +12,9 @@ public interface TripService
 
     public bool Delete(int id);
     public TripDTO findById(int id);
+    public interface ITripService
+    {
+        Task<bool> IsTripExistAsync(int departureLocationId, int arrivalLocationId, DateTime dateStart);
+    }
 
 }

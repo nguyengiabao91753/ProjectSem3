@@ -32,6 +32,12 @@ public class TripServiceImpl : TripService
                 throw new Exception("All required fields must be provided.");
             }
 
+            // Kiểm tra nếu chuyến đi đã tồn tại dựa trên DepartureLocationId, ArrivalLocationId và DateStart
+            if (IsTripExist((int)trip.DepartureLocationId, (int)trip.ArrivalLocationId, trip.DateStart))
+            {
+                throw new Exception("A trip with the same DepartureLocationId, ArrivalLocationId, and DateStart already exists.");
+            }
+
             db.Trips.Add(trip);
             return db.SaveChanges() > 0;
         }
@@ -81,5 +87,13 @@ public class TripServiceImpl : TripService
         {
             return false;
         }
+    }
+
+    // Hàm kiểm tra sự tồn tại của Trip
+    private bool IsTripExist(int departureLocationId, int arrivalLocationId, DateTime dateStart)
+    {
+        return db.Trips.Any(t => t.DepartureLocationId == departureLocationId
+                              && t.ArrivalLocationId == arrivalLocationId
+                              && t.DateStart == dateStart);
     }
 }
