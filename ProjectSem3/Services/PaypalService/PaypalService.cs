@@ -34,7 +34,7 @@ public class PaypalService
             {
                 return new Item
                 {
-                    name = x.TicketCode,
+                    name = x.SeatName,
                     currency = "USD",
                     price = (x.PriceAfterDiscount).ToString("F2"),
                     quantity = "1"
@@ -148,4 +148,7 @@ public class PaypalService
             {"clientId", configuration["PayPal:ClientId"] },
             {"clientSecret", configuration["PayPal:ClientSecret"] }
         };
+
+
+
 }

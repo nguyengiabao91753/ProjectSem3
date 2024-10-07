@@ -15,6 +15,7 @@ using ProjectSem3.Services.PaymentService;
 using ProjectSem3.Services.PaypalService;
 using ProjectSem3.Services.PolicyService;
 using ProjectSem3.Services.TripService;
+using ProjectSem3.Services.VNPay;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -71,6 +72,7 @@ builder.Services.AddScoped<BusesSeatService, BusesSeatServiceImpl>();
 builder.Services.AddScoped<PaymentService, PaymentServiceImpl>();
 builder.Services.AddScoped<PaypalService>();
 builder.Services.AddScoped<BookingServiceImpl>();
+builder.Services.AddScoped<VnPayService, VnPayServiceImpl>();
 //builder.Services.TryAddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
 builder.Services.AddScoped<PolicyService, PolicyServiceImpl>();
