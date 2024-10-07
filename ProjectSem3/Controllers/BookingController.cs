@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using ProjectSem3.DTOs;
 using ProjectSem3.Services.BookingService;
-using ProjectSem3.Services.BusesTripService;
 
 namespace ProjectSem3.Controllers;
 [Route("api/booking")]
@@ -9,7 +8,7 @@ namespace ProjectSem3.Controllers;
 public class BookingController : Controller
 {
     private BookingService bookingService;
-    public BookingController(BookingService bookingService )
+    public BookingController(BookingService bookingService)
     {
         this.bookingService = bookingService;
     }
@@ -20,7 +19,7 @@ public class BookingController : Controller
     {
         try
         {
-            bool result = bookingService.Create(bookingRequest.BookingDTO, bookingRequest.BookingDetailDTOs);
+            bool result = bookingService.Create(bookingRequest.BookingDTO, bookingRequest.BookingDetailDTOs, "Paypal");
 
             return Ok(new
             {
@@ -35,10 +34,29 @@ public class BookingController : Controller
             return BadRequest(ex.Message);
         }
     }
-}
 
-public class BookingRequest
-{
-    public BookingDTO BookingDTO { get; set; }
-    public List<BookingDetailDTO> BookingDetailDTOs { get; set; }
+    [Consumes("application/json")]
+    [Produces("application/json")]
+    [HttpGet("getall")]
+    public IActionResult Getall()
+    {
+        try
+        {
+            var booking = bookingService.GetAll();
+            var details = bookingService.GetAllDetail();
+
+            return Ok(new
+            {
+                booking = booking,
+                details = details
+            }
+            );
+
+            throw new Exception();
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(ex.Message);
+        }
+    }
 }

@@ -1,6 +1,4 @@
-﻿using ProjectSem3.Models;
-
-namespace ProjectSem3.DTOs;
+﻿namespace ProjectSem3.DTOs;
 
 public class BookingDTO
 {
@@ -20,8 +18,8 @@ public class BookingDTO
     public int? BusTripId { get; set; }
     public string? BookingDate { get; set; }
 
-    public decimal? Total { get; set; }
+    public decimal Total { get; set; }
     public byte? PaymentStatus { get; set; }
 
-    
+
 }
