@@ -44,14 +44,20 @@ public partial class DatabaseContext : DbContext
     public virtual DbSet<User> Users { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see https://go.microsoft.com/fwlink/?LinkId=723263.
+
         => optionsBuilder.UseSqlServer("Server=DESKTOP-V4SS9V4\\SQLEXPRESS;Database=Bus_Ticket;user id=sa;password=123456789;trusted_connection=true;encrypt=false");
+
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<Account>(entity =>
         {
+            entity.HasKey(e => e.AccountId).HasName("PK__Accounts__349DA586AE10859D");
+            entity.HasKey(e => e.AccountId).HasName("PK__Accounts__349DA5861664C857");
             entity.HasKey(e => e.AccountId).HasName("PK__Accounts__349DA5868EDAA38E");
+
 
             entity.Property(e => e.AccountId)
                 .ValueGeneratedNever()
@@ -75,6 +81,9 @@ public partial class DatabaseContext : DbContext
 
         modelBuilder.Entity<AgeGroup>(entity =>
         {
+            entity.HasKey(e => e.AgeGroupId).HasName("PK__AgeGroup__5B9B0B75487F19D6");
+            entity.HasKey(e => e.AgeGroupId).HasName("PK__AgeGroup__5B9B0B75335DED11");
+
             entity.HasKey(e => e.AgeGroupId).HasName("PK__AgeGroup__5B9B0B751A0D376A");
 
             entity.Property(e => e.AgeGroupId).HasColumnName("AgeGroupID");
@@ -87,6 +96,7 @@ public partial class DatabaseContext : DbContext
 
         modelBuilder.Entity<Booking>(entity =>
         {
+
             entity.HasKey(e => e.BookingId).HasName("PK__Bookings__73951ACD8AF7FF5A");
 
             entity.Property(e => e.BookingId).HasColumnName("BookingID");
@@ -132,6 +142,9 @@ public partial class DatabaseContext : DbContext
 
         modelBuilder.Entity<Bus>(entity =>
         {
+            entity.HasKey(e => e.BusId).HasName("PK__Buses__6A0F6095D39F8C9E");
+            entity.HasKey(e => e.BusId).HasName("PK__Buses__6A0F6095EA63B6EC");
+
             entity.HasKey(e => e.BusId).HasName("PK__Buses__6A0F6095E9634EE3");
 
             entity.Property(e => e.BusId).HasColumnName("BusID");
@@ -148,6 +161,9 @@ public partial class DatabaseContext : DbContext
 
         modelBuilder.Entity<BusType>(entity =>
         {
+            entity.HasKey(e => e.BusTypeId).HasName("PK__BusTypes__84A10CC812177BC9");
+            entity.HasKey(e => e.BusTypeId).HasName("PK__BusTypes__84A10CC881B7A277");
+
             entity.HasKey(e => e.BusTypeId).HasName("PK__BusTypes__84A10CC89659EC58");
 
             entity.Property(e => e.BusTypeId).HasColumnName("BusTypeID");
@@ -157,6 +173,8 @@ public partial class DatabaseContext : DbContext
 
         modelBuilder.Entity<BusesSeat>(entity =>
         {
+            entity.HasKey(e => e.SeatId).HasName("PK__Buses_Se__311713D3F28446BF");
+            entity.HasKey(e => e.SeatId).HasName("PK__Buses_Se__311713D3D3F85F6F");
             entity.HasKey(e => e.SeatId).HasName("PK__Buses_Se__311713D3C9DFC1E7");
 
             entity.ToTable("Buses_Seats");
@@ -173,6 +191,8 @@ public partial class DatabaseContext : DbContext
 
         modelBuilder.Entity<BusesTrip>(entity =>
         {
+            entity.HasKey(e => e.BusTripId).HasName("PK__BusesTri__14ADEEED91B91E5F");
+            entity.HasKey(e => e.BusTripId).HasName("PK__BusesTri__14ADEEEDC258F61D");
             entity.HasKey(e => e.BusTripId).HasName("PK__BusesTri__14ADEEEDA77A18C0");
 
             entity.Property(e => e.BusTripId).HasColumnName("BusTripID");
@@ -192,6 +212,9 @@ public partial class DatabaseContext : DbContext
 
         modelBuilder.Entity<CustomerFeedback>(entity =>
         {
+            entity.HasKey(e => e.FeedbackId).HasName("PK__Customer__6A4BEDF6D015C815");
+            entity.HasKey(e => e.FeedbackId).HasName("PK__Customer__6A4BEDF6145C34BD");
+
             entity.HasKey(e => e.FeedbackId).HasName("PK__Customer__6A4BEDF6E3F0D4C6");
 
             entity.ToTable("CustomerFeedback");
@@ -213,6 +236,10 @@ public partial class DatabaseContext : DbContext
 
         modelBuilder.Entity<Level>(entity =>
         {
+            entity.HasKey(e => e.LevelId).HasName("PK__Levels__09F03C06D66A2E17");
+
+            entity.HasKey(e => e.LevelId).HasName("PK__Levels__09F03C0653D98E81");
+
             entity.HasKey(e => e.LevelId).HasName("PK__Levels__09F03C06C9CC97D0");
 
             entity.Property(e => e.LevelId).HasColumnName("LevelID");
@@ -222,6 +249,9 @@ public partial class DatabaseContext : DbContext
 
         modelBuilder.Entity<Location>(entity =>
         {
+            entity.HasKey(e => e.LocationId).HasName("PK__Location__E7FEA477A980D6F8");
+            entity.HasKey(e => e.LocationId).HasName("PK__Location__E7FEA477ED535BCD");
+
             entity.HasKey(e => e.LocationId).HasName("PK__Location__E7FEA477CC92E96C");
 
             entity.Property(e => e.LocationId).HasColumnName("LocationID");
@@ -231,7 +261,10 @@ public partial class DatabaseContext : DbContext
 
         modelBuilder.Entity<Payment>(entity =>
         {
+            entity.HasKey(e => e.PaymentId).HasName("PK__Payments__9B556A588EF2614D");
+            entity.HasKey(e => e.PaymentId).HasName("PK__Payments__9B556A5891004621");
             entity.HasKey(e => e.PaymentId).HasName("PK__Payments__9B556A5865DAB4E7");
+
 
             entity.Property(e => e.PaymentId).HasColumnName("PaymentID");
             entity.Property(e => e.Amount).HasColumnType("decimal(18, 2)");
@@ -246,6 +279,9 @@ public partial class DatabaseContext : DbContext
 
         modelBuilder.Entity<Policy>(entity =>
         {
+            entity.HasKey(e => e.PolicyId).HasName("PK__Policies__2E1339449303642F");
+            entity.HasKey(e => e.PolicyId).HasName("PK__Policies__2E133944CCB3983A");
+
             entity.HasKey(e => e.PolicyId).HasName("PK__Policies__2E133944D44A48AF");
 
             entity.Property(e => e.PolicyId).HasColumnName("PolicyID");
@@ -256,6 +292,8 @@ public partial class DatabaseContext : DbContext
 
         modelBuilder.Entity<Trip>(entity =>
         {
+            entity.HasKey(e => e.TripId).HasName("PK__Trips__51DC711E471D9D0A");
+            entity.HasKey(e => e.TripId).HasName("PK__Trips__51DC711E4B66A50B");
             entity.HasKey(e => e.TripId).HasName("PK__Trips__51DC711EEF833D8D");
 
             entity.Property(e => e.TripId).HasColumnName("TripID");
@@ -276,7 +314,12 @@ public partial class DatabaseContext : DbContext
 
         modelBuilder.Entity<User>(entity =>
         {
+
+            entity.HasKey(e => e.UserId).HasName("PK__Users__1788CCACB2BD3965");
+            entity.HasKey(e => e.UserId).HasName("PK__Users__1788CCACFEE889C1");
+
             entity.HasKey(e => e.UserId).HasName("PK__Users__1788CCAC70223897");
+
 
             entity.Property(e => e.UserId).HasColumnName("UserID");
             entity.Property(e => e.Address).HasMaxLength(200);

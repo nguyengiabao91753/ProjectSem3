@@ -1,11 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
+﻿namespace ProjectSem3.Models;
 
-namespace ProjectSem3.Models;
-
-public partial class User
+public class AccountUser
 {
     public int UserId { get; set; }
+
+    public string Username { get; set; } = null!;
+
+    public string Password { get; set; } = null!;
+
+    public byte? Status { get; set; }
+
+    public int? LevelId { get; set; }
 
     public string FullName { get; set; } = null!;
 
@@ -19,7 +24,5 @@ public partial class User
 
     public DateTime CreatedAt { get; set; }
 
-    public virtual Account? Account { get; set; }
-
-    public virtual ICollection<CustomerFeedback> CustomerFeedbacks { get; set; } = new List<CustomerFeedback>();
 }
+
