@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
 using ProjectSem3.DTOs;
+using ProjectSem3.Helpers;
 using ProjectSem3.Models;
-using System.Collections.Generic;
 
 namespace ProjectSem3.Services.BookingService;
 
@@ -9,14 +9,17 @@ public class BookingServiceImpl : BookingService
 {
     private DatabaseContext db;
     private IMapper mapper;
+    private IConfiguration configuration;
     public BookingServiceImpl(
         DatabaseContext databaseContext,
-        IMapper mapper
+        IMapper mapper,
+        IConfiguration configuration
 
         )
     {
         db = databaseContext;
         this.mapper = mapper;
+        this.configuration = configuration;
     }
 
     public string GenerateTicketCode(int plusId)
@@ -27,12 +30,12 @@ public class BookingServiceImpl : BookingService
 
         for (int i = 0; i < 5; i++)
         {
-            id += chars[random.Next(chars.Length)] + plusId;
+            id += chars[random.Next(chars.Length)];
         }
-        return id;
+        return id + plusId;
     }
 
-    public bool Create(BookingDTO bookingDTO, List<BookingDetailDTO> bookingDetailsdto)
+    public bool Create(BookingDTO bookingDTO, List<BookingDetailDTO> bookingDetailsdto, string paymentMethod)
     {
         try
         {
@@ -81,7 +84,7 @@ public class BookingServiceImpl : BookingService
                         {
                             seat.Status = 0;
                             db.BusesSeats.Update(seat);
- 
+
                             bookingDetails[i].BookingId = book.BookingId;
                             bookingDetails[i].TicketStatus = 1;
                             db.BookingDetails.Add(bookingDetails[i]);
@@ -104,12 +107,25 @@ public class BookingServiceImpl : BookingService
                         db.BusesTrips.Update(bustrip);
 
                     }
-                    return db.SaveChanges()>0;
+                    var payment = new Models.Payment();
+                    payment.BookingId = book.BookingId;
+                    payment.PaymentDate = DateTime.Now;
+                    payment.Amount = book.Total;
+                    payment.PaymentMethod = paymentMethod;
+                    db.Payments.Add(payment);
+
+                    if (db.SaveChanges() > 0)
+                    {
+                        SenMailwithQRCodeHelper senMailwithQRCode = new SenMailwithQRCodeHelper(configuration);
+                        senMailwithQRCode.SenMailwithQRCode(book, bookingDetails);
+                        return true;
+
+                    }
 
                 }
             }
 
-                    return false;
+            return false;
 
         }
         catch (Exception ex)
@@ -138,7 +154,7 @@ public class BookingServiceImpl : BookingService
         {
             var book = mapper.Map<Booking>(bookingDTO);
             var bustrip = db.BusesTrips.FirstOrDefault(b => b.BusTripId == book.BusTripId);
-            var bookingdetails = db.BookingDetails.Where(b=>b.BookingId == book.BookingId).ToList();
+            var bookingdetails = db.BookingDetails.Where(b => b.BookingId == book.BookingId).ToList();
             if (bustrip != null && bookingdetails != null)
             {
                 //var seat = db.BusesSeats.FirstOrDefault(s => s.BusId == bustrip.BusId && s.SeatId == book.SeatId);
@@ -176,12 +192,12 @@ public class BookingServiceImpl : BookingService
 
 
                     var seat = db.BusesSeats.SingleOrDefault(s => s.BusId == bustrip.BusId && s.SeatId == bookingdetails[i].SeatId);
-                   
+
                     if (seat != null)
                     {
                         seat.Status = 1;
                         db.BusesSeats.Update(seat);
-                       
+
 
                         bookingdetails[i].TicketStatus = 2;
                         bookingdetails[i].TicketCode = "";
@@ -196,7 +212,7 @@ public class BookingServiceImpl : BookingService
                     bustrip.Status = 1;
                     db.BusesTrips.Update(bustrip);
                 }
-                return db.SaveChanges() >0;
+                return db.SaveChanges() > 0;
 
             }
 
@@ -208,4 +224,26 @@ public class BookingServiceImpl : BookingService
             return false;
         }
     }
+
+    public List<BookingDTO> GetAll()
+    {
+        return mapper.Map<List<BookingDTO>>(db.Bookings.OrderByDescending(b => b.BookingId).ToList());
+    }
+
+    public List<BookingDetailDTO> GetAllDetail()
+    {
+        return mapper.Map<List<BookingDetailDTO>>(db.BookingDetails.ToList());
+    }
+
+    public List<BookingDTO> GetAllByUserId(int id)
+    {
+        return mapper.Map<List<BookingDTO>>(db.Bookings.Where(b => b.UserId == id).OrderByDescending(b => b.BookingId).ToList());
+    }
+
+    public List<BookingDetailDTO> GetDetailByBooking(int id)
+    {
+        return mapper.Map<List<BookingDetailDTO>>(db.BookingDetails.Where(d => d.BookingId == id).ToList());
+    }
+
+
 }

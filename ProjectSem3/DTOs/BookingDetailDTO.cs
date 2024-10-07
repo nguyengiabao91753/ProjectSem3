@@ -12,7 +12,9 @@ public class BookingDetailDTO
 
     public int? AgeGroupId { get; set; }
 
-    public decimal? PriceAfterDiscount { get; set; }
+    public string? AgeGroupName { get; set; }
+
+    public decimal PriceAfterDiscount { get; set; }
 
     public string TicketCode { get; set; } = null!;
 
