@@ -19,7 +19,7 @@ public class LocationServiceImpl : LocationService
 
     public bool CheckLocationNameExists(string name)
     {
-        return db.Locations.Any(l => l.Name == name);
+        return db.Locations.Any(b => b.Name == name);
     }
 
     public bool Create(LocationDTO locationDTO)

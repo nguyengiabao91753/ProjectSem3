@@ -47,6 +47,7 @@ public class BookingServiceImpl : BookingService
             db.Bookings.Add(book);
             if (db.SaveChanges() > 0)
             {
+               
                 var bustrip = db.BusesTrips.SingleOrDefault(b => b.BusTripId == book.BusTripId);
 
                 if (bustrip != null)
@@ -136,6 +137,7 @@ public class BookingServiceImpl : BookingService
             var bookingdetails = db.BookingDetails.Where(b => b.BookingId == book.BookingId).ToList();
             if (bustrip != null && bookingdetails != null)
             {
+               
                 for (int i = 0; i < bookingdetails.Count; i++)
                 {
 
