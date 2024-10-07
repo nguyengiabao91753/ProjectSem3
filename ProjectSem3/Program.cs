@@ -17,14 +17,14 @@ using ProjectSem3.Services.PaypalService;
 using ProjectSem3.Services.PolicyService;
 using ProjectSem3.Services.TripService;
 using System.Text;
+using Microsoft.Extensions.Options;
 
 var builder = WebApplication.CreateBuilder(args);
-
+// Read configuration file (appsettings.json)
+builder.Configuration.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
 builder.Services.AddSignalR();
 
 // Add services to the container.
-
-builder.Services.AddControllers();
 builder.Services.AddControllers();
 builder.Services.AddCors(); //cho phép bên ngoài gọi API
 
@@ -36,7 +36,9 @@ builder.Services.AddAuthentication(option =>
     option.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
 }).AddJwtBearer(option =>
 {
-    option.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
+    //option.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
+    option.TokenValidationParameters = new TokenValidationParameters
+
     {
         ValidateIssuer = true,
         ValidateAudience = true,
@@ -75,7 +77,8 @@ builder.Services.AddScoped<BusService, BusServiceImpl>();
 builder.Services.AddScoped<BusesSeatService, BusesSeatServiceImpl>();
 builder.Services.AddScoped<PaymentService, PaymentServiceImpl>();
 builder.Services.AddScoped<PaypalService>();
-//builder.Services.AddScoped<BookingServiceImpl>();
+builder.Services.AddScoped<BookingServiceImpl>();
+
 //builder.Services.TryAddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
 builder.Services.AddScoped<PolicyService, PolicyServiceImpl>();
@@ -106,6 +109,19 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+
+// Configure the HTTP request pipeline.
+// Cấu hình pipeline cho yêu cầu HTTP
+if (app.Environment.IsDevelopment())
+{
+    app.UseDeveloperExceptionPage(); // Sử dụng trang ngoại lệ cho nhà phát triển
+}
+app.UseHttpsRedirection(); // Tự động chuyển hướng sang HTTPS
+app.UseRouting(); // Cấu hình định tuyến
+app.UseCors(x => x.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader()); // Cho phép tất cả các nguồn, phương thức, và header
+
+
 
 // Cấu hình endpoint cho SignalR
 app.MapHub<SeatHub>("/seatHub");
