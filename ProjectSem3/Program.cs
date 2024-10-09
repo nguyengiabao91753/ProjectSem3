@@ -4,12 +4,14 @@ using Microsoft.IdentityModel.Tokens;
 using ProjectSem3.DTOs;
 using ProjectSem3.Hubs;
 using ProjectSem3.Models;
+using ProjectSem3.Services.AccountService;
 using ProjectSem3.Services.AgeGroupService;
 using ProjectSem3.Services.BookingService;
 using ProjectSem3.Services.BusesSeatService;
 using ProjectSem3.Services.BusesTripService;
 using ProjectSem3.Services.BusService;
 using ProjectSem3.Services.BusTypeService;
+using ProjectSem3.Services.LevelService;
 using ProjectSem3.Services.LocationService;
 using ProjectSem3.Services.PaymentService;
 using ProjectSem3.Services.PaypalService;
@@ -19,12 +21,11 @@ using ProjectSem3.Services.VNPay;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
-
+// Read configuration file (appsettings.json)
+builder.Configuration.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
 builder.Services.AddSignalR();
 
 // Add services to the container.
-
-builder.Services.AddControllers();
 builder.Services.AddControllers();
 builder.Services.AddCors(); //cho phép bên ngoài gọi API
 
@@ -36,7 +37,9 @@ builder.Services.AddAuthentication(option =>
     option.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
 }).AddJwtBearer(option =>
 {
-    option.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
+    //option.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
+    option.TokenValidationParameters = new TokenValidationParameters
+
     {
         ValidateIssuer = true,
         ValidateAudience = true,
@@ -62,6 +65,10 @@ builder.Services.AddSwaggerGen();
 
 builder.Services.AddScoped<BusesTripService, BusesTripServiceImpl>();
 builder.Services.AddScoped<AgeGroupService, AgeGroupServiceImpl>();
+builder.Services.AddScoped<LevelService, LevelServiceImpl>();
+builder.Services.AddScoped<AccountUserService, AccountUserServiceImpl>();
+
+
 builder.Services.AddScoped<TripService, TripServiceImpl>();
 builder.Services.AddScoped<LocationService, LocationServiceImpl>();
 builder.Services.AddScoped<BookingService, BookingServiceImpl>();
@@ -90,9 +97,10 @@ app.UseCors(builder => builder
 
 
 app.UseAuthentication(); //kích hoạt midddlewarre xác thực . Ví dụ, nó có thể đảm nhận việc kiểm tra xem người dùng đã đăng nhập chưa trước khi truy cập vào một trang hoặc tài nguyên cụ thể.
-
+// Validate the token
 
 app.UseAuthorization(); // kích hoạt middleware phân quyền. Ví dụ, nó có thể kiểm tra xem người dùng có quyền truy cập vào một trang hay tài nguyên cụ thể không dựa trên vai trò hoặc các yêu cầu quyền.
+// Check for user permissions/roles
 
 
 // Configure the HTTP request pipeline.
@@ -102,6 +110,19 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+
+// Configure the HTTP request pipeline.
+// Cấu hình pipeline cho yêu cầu HTTP
+if (app.Environment.IsDevelopment())
+{
+    app.UseDeveloperExceptionPage(); // Sử dụng trang ngoại lệ cho nhà phát triển
+}
+app.UseHttpsRedirection(); // Tự động chuyển hướng sang HTTPS
+app.UseRouting(); // Cấu hình định tuyến
+app.UseCors(x => x.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader()); // Cho phép tất cả các nguồn, phương thức, và header
+
+
 
 // Cấu hình endpoint cho SignalR
 app.MapHub<SeatHub>("/seatHub");

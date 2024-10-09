@@ -1,4 +1,5 @@
 ﻿using ProjectSem3.DTOs;
+using ProjectSem3.Models;
 
 namespace ProjectSem3.Services.BookingService;
 
@@ -16,4 +17,14 @@ public interface BookingService
 
     public List<BookingDetailDTO> GetDetailByBooking(int id);
     public List<BookingDetailDTO> GetAllDetail();
+
+    public BookingDetailDTO GetBookingDetailByTicketCode(string ticketCode);
+
+    public BookingDTO GetBookingById(int id);
+
+    public BookingDetail getBookingDetailByTicketCode(string ticketCode);
+
+    public Booking getBookingById(int id);
+
+    public bool UseTicket(string ticketCode);
 }

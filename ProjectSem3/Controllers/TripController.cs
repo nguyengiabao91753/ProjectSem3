@@ -118,4 +118,19 @@ public class TripController : Controller
             return BadRequest(ex.Message);
         }
     }
+
+    /*    [HttpGet("check-duplicate-trip")]
+        public IActionResult checkDuplicateTrip([FromQuery] int departureLocationId, [FromQuery] int arrivalLocationId, [FromQuery] DateTime dateStart)
+        {
+            try
+            {
+                // Gọi phương thức CheckTripsAsync để kiểm tra xem chuyến đi đã tồn tại hay chưa
+                var exists = tripService.checkDuplicateTrip(departureLocationId, arrivalLocationId, dateStart);
+                return Ok(new { exists });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }*/
 }

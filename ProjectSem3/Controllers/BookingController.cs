@@ -59,4 +59,71 @@ public class BookingController : Controller
             return BadRequest(ex.Message);
         }
     }
+
+    [Consumes("application/json")]
+    [Produces("application/json")]
+    [HttpGet("getbookingrequestbyticketcode/{ticketcode}")]
+    public IActionResult GetBookingRequestByTicketCode(string ticketcode)
+    {
+        try
+        {
+            var detail = bookingService.getBookingDetailByTicketCode(ticketcode);
+            var booking = bookingService.getBookingById(detail.BookingId);
+            if (detail == null)
+            {
+                return Ok(new
+                {
+                    status = false
+                });
+            }
+            return Ok(new
+            {
+                status = true,
+                departure = booking.BusTrip.Trip.DepartureLocation.Name,
+                arrival = booking.BusTrip.Trip.ArrivalLocation.Name,
+                dateStart = booking.BusTrip.Trip.DateStart.ToString("HH:mm:ss dd/MM/yyyy"),
+                dateEnd = booking.BusTrip.Trip.DateEnd.ToString("HH:mm:ss dd/MM/yyyy"),
+                fullName = booking.FullName,
+                email = booking.Email,
+                seatName = detail.SeatName,
+                busTypeName = booking.BusTrip.Bus.BusType.Name,
+                licensePlate = booking.BusTrip.Bus.LicensePlate,
+                ticketCode = detail.TicketCode,
+                bookingDate = booking.BookingDate.ToString("HH:mm:ss dd/MM/yyyy"),
+                ticketStatus = detail.TicketStatus,
+            }
+            );
+
+            throw new Exception();
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(ex.Message);
+        }
+    }
+
+    [Consumes("application/json")]
+    [Produces("application/json")]
+    [HttpGet("useticket/{ticketcode}")]
+    public IActionResult UseTicket(string ticketcode)
+    {
+        try
+        {
+            var result = bookingService.UseTicket(ticketcode);
+
+
+            return Ok(new
+            {
+                status = result
+            });
+
+
+
+            throw new Exception();
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(ex.Message);
+        }
+    }
 }
