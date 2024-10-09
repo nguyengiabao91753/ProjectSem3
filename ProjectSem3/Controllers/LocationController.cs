@@ -64,13 +64,12 @@ public class LocationController : Controller
     {
         try
         {
-            var exist = locationService.CheckLocationNameExists(name);
-            return Ok(new { exist });
-
+            var exists = locationService.CheckLocationNameExists(name);
+            return Ok(new { exists });
         }
         catch (Exception ex)
         {
-            return BadRequest(ex);
+            return BadRequest(ex.Message);
         }
     }
 

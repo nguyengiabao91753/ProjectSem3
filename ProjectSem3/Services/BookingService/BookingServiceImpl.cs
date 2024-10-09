@@ -47,30 +47,7 @@ public class BookingServiceImpl : BookingService
             db.Bookings.Add(book);
             if (db.SaveChanges() > 0)
             {
-                //var seat = db.BusesSeats.FirstOrDefault(s => s.BusId == bustrip.BusId && s.SeatId == book.SeatId);
-
-                //if (seat != null)
-                //{
-                //    seat.Status = 0;
-                //    db.BusesSeats.Update(seat);
-                //    var countseat = db.BusesSeats.Count(s => s.BusId == bustrip.BusId && s.Status == 1);
-                //    if (countseat == 0)
-                //    {
-                //        bustrip.Status = 2;
-                //        db.BusesTrips.Update(bustrip);
-
-                //    }
-                //    book.BookingDate = DateTime.Now;
-
-                //    db.Bookings.Add(book);
-                //    if( db.SaveChanges() > 0)
-                //    {
-                //        book.TicketCode = GenerateTicketCode(book.BookingId);
-                //        db.Bookings.Update(book);
-                //        return db.SaveChanges() > 0;
-                //    }
-                //}
-                /*                var seat = db.BusesSeats.FirstOrDefault(s => s.BusId == bustrip.BusId && s.SeatId == book.SeatId);*/
+               
                 var bustrip = db.BusesTrips.SingleOrDefault(b => b.BusTripId == book.BusTripId);
 
                 if (bustrip != null)
@@ -112,6 +89,9 @@ public class BookingServiceImpl : BookingService
                     payment.PaymentDate = DateTime.Now;
                     payment.Amount = book.Total;
                     payment.PaymentMethod = paymentMethod;
+                    book.PaymentStatus = 1;
+
+                    db.Bookings.Update(book);
                     db.Payments.Add(payment);
 
                     if (db.SaveChanges() > 0)
@@ -157,36 +137,7 @@ public class BookingServiceImpl : BookingService
             var bookingdetails = db.BookingDetails.Where(b => b.BookingId == book.BookingId).ToList();
             if (bustrip != null && bookingdetails != null)
             {
-                //var seat = db.BusesSeats.FirstOrDefault(s => s.BusId == bustrip.BusId && s.SeatId == book.SeatId);
-                //db.BusesSeats.Update(seat);
-                //if (seat != null)
-                //{
-                //    seat.Status = 1;
-                //    var countseat = db.BusesSeats.Count(b=>b.BusId==bustrip.BusId && b.SeatId==book.SeatId);
-                //    if(countseat == 0)
-                //    {
-                //        bustrip.Status = 1;
-                //        db.BusesTrips.Update(bustrip);
-                //    }
-
-                //    book.TicketStatus = 2;
-                //    book.TicketCode = "";
-                //    db.Entry(book).State = Microsoft.EntityFrameworkCore.EntityState.Modified;
-                //    return db.SaveChanges() > 0;
-
-                //}
-
-                /*           var seat = db.BusesSeats.FirstOrDefault(s => s.BusId == bustrip.BusId && s.SeatId == book.SeatId);*/
-                /*                db.BusesSeats.Update(seat);
-                                if (seat != null)
-                                {*/
-                /*                    seat.Status = 1;*/
-                /*                    var countseat = db.BusesSeats.Count(b => b.BusId == bustrip.BusId && b.SeatId == book.SeatId);*/
-                /*                    if (countseat == 0)
-                                    {
-                                        bustrip.Status = 1;
-                                        db.BusesTrips.Update(bustrip);
-                                    }*/
+               
                 for (int i = 0; i < bookingdetails.Count; i++)
                 {
 
@@ -245,5 +196,36 @@ public class BookingServiceImpl : BookingService
         return mapper.Map<List<BookingDetailDTO>>(db.BookingDetails.Where(d => d.BookingId == id).ToList());
     }
 
+    public BookingDetailDTO GetBookingDetailByTicketCode(string ticketCode)
+    {
+        var detail = mapper.Map<BookingDetailDTO>(db.BookingDetails.Where(d=>d.TicketCode == ticketCode).FirstOrDefault());
+        return detail;
+    }
 
+    public BookingDTO GetBookingById(int id)
+    {
+        var booking = mapper.Map<BookingDTO>(db.Bookings.Find(id));
+        return booking;
+    }
+
+    public BookingDetail getBookingDetailByTicketCode(string ticketCode)
+    {
+        var booking = db.BookingDetails.Where(d => d.TicketCode == ticketCode).FirstOrDefault();
+        return booking;
+    }
+
+    public Booking getBookingById(int id)
+    {
+        var booking = db.Bookings.Find(id);
+        return booking;
+    }
+
+    public bool UseTicket(string ticketCode)
+    {
+       
+        var detail = db.BookingDetails.Where(d => d.TicketCode == ticketCode).FirstOrDefault();
+        detail.TicketStatus = 0;
+        db.BookingDetails.Update(detail);
+        return db.SaveChanges() > 0;
+    }
 }

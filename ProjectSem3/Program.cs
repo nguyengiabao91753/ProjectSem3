@@ -6,14 +6,11 @@ using ProjectSem3.Hubs;
 using ProjectSem3.Models;
 using ProjectSem3.Services.AccountService;
 using ProjectSem3.Services.AgeGroupService;
-using ProjectSem3.Services.LevelService;
-using System.Text;
-
-using ProjectSem3.Services.BookingService;
 using ProjectSem3.Services.BusesSeatService;
 using ProjectSem3.Services.BusesTripService;
 using ProjectSem3.Services.BusService;
 using ProjectSem3.Services.BusTypeService;
+using ProjectSem3.Services.LevelService;
 using ProjectSem3.Services.LocationService;
 using ProjectSem3.Services.PaymentService;
 using ProjectSem3.Services.PaypalService;
@@ -21,6 +18,7 @@ using ProjectSem3.Services.PolicyService;
 using ProjectSem3.Services.TripService;
 using System.Text;
 using Microsoft.Extensions.Options;
+using ProjectSem3.Services.BookingService;
 
 var builder = WebApplication.CreateBuilder(args);
 // Read configuration file (appsettings.json)
@@ -68,13 +66,13 @@ builder.Services.AddSwaggerGen();
 
 builder.Services.AddScoped<BusesTripService, BusesTripServiceImpl>();
 builder.Services.AddScoped<AgeGroupService, AgeGroupServiceImpl>();
-builder.Services.AddScoped<LevelService,LevelServiceImpl>();
+builder.Services.AddScoped<LevelService, LevelServiceImpl>();
 builder.Services.AddScoped<AccountUserService, AccountUserServiceImpl>();
 
 
 builder.Services.AddScoped<TripService, TripServiceImpl>();
 builder.Services.AddScoped<LocationService, LocationServiceImpl>();
-//builder.Services.AddScoped<BookingService, BookingServiceImpl>();
+builder.Services.AddScoped<BookingService, BookingServiceImpl>();
 
 builder.Services.AddScoped<BusTypeService, BusTypeServiceImpl>();
 builder.Services.AddScoped<BusService, BusServiceImpl>();
