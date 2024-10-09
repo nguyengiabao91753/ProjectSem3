@@ -298,32 +298,32 @@ public class AccountUserController :Controller
         return result ? Ok(new { status = "Account set to active successfully" })
                       : BadRequest(new { error = "Failed to set account to active" });
     }
-    [HttpPost("loginWithGoogle")]
-    public async Task<IActionResult> LoginWithGoogle([FromBody] string idToken)
-    {
-        try
-        {
-            var payload = await GoogleJsonWebSignature.ValidateAsync(idToken, new GoogleJsonWebSignature.ValidationSettings()
-            {
-                Audience = new[] { configuration["Google:ClientId"] }
-            });
+    //[HttpPost("loginWithGoogle")]
+    //public async Task<IActionResult> LoginWithGoogle([FromBody] string idToken)
+    //{
+    //    try
+    //    {
+    //        var payload = await GoogleJsonWebSignature.ValidateAsync(idToken, new GoogleJsonWebSignature.ValidationSettings()
+    //        {
+    //            Audience = new[] { configuration["Google:ClientId"] }
+    //        });
 
-            if (payload != null)
-            {
-                var user = accountUserService.FindByUsername(payload.Email);
-                if (user != null)
-                {
-                    var token = accountUserService.GenerateJSONWebToken(user.Username, user.UserId);
-                    return Ok(new { token, userId = user.UserId });
-                }
-            }
+    //        if (payload != null)
+    //        {
+    //            var user = accountUserService.FindByUsername(payload.Email);
+    //            if (user != null)
+    //            {
+    //                var token = accountUserService.GenerateJSONWebToken(user.Username, user.UserId);
+    //                return Ok(new { token, userId = user.UserId });
+    //            }
+    //        }
 
-            return Unauthorized(new { message = "Invalid Google Token" });
-        }
-        catch (Exception ex)
-        {
-            return StatusCode(500, new { message = "An error occurred while validating Google token", details = ex.Message });
-        }
+    //        return Unauthorized(new { message = "Invalid Google Token" });
+    //    }
+    //    catch (Exception ex)
+    //    {
+    //        return StatusCode(500, new { message = "An error occurred while validating Google token", details = ex.Message });
+    //    }
     }
 
 
