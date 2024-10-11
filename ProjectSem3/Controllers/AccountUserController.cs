@@ -1,16 +1,13 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using ProjectSem3.DTOs;
-using ProjectSem3.Models;
 using ProjectSem3.Services.AccountService;
-using ProjectSem3.Services.AgeGroupService;
-using System.Globalization;
 using System.Security.Claims;
 
 namespace ProjectSem3.Controllers;
 [Route("api/accountUser")]
 
-public class AccountUserController :Controller
+public class AccountUserController : Controller
 {
     private AccountUserService accountUserService;
     private IConfiguration configuration;
@@ -55,7 +52,7 @@ public class AccountUserController :Controller
 
 
 
-            var existingAccount = accountUserService.FindByUsername(accountUserDTO.Username);   
+            var existingAccount = accountUserService.FindByUsername(accountUserDTO.Username);
             if (existingAccount != null)
             {
                 return BadRequest(new { error = "Username already exists" });
@@ -65,24 +62,27 @@ public class AccountUserController :Controller
             accountUserDTO.Password = BCrypt.Net.BCrypt.HashPassword(accountUserDTO.Password);
             bool result = accountUserService.CreateAccountUser(accountUserDTO);
 
-                if (result)
-                {
-                    return Ok(new {status = "Account created successfully" });
+            if (result)
+            {
+                return Ok(new { status = "Account created successfully" });
 
-                }
-                else
-                {
-                    return BadRequest(new { error = "Error during account creation" });
-
-                }
             }
-          
-         catch (Exception ex)
+            else
+            {
+                return BadRequest(new { error = "Error during account creation" });
+
+            }
+        }
+
+        catch (Exception ex)
         {
             Console.WriteLine("Error during account creation: " + ex.Message);
-            return StatusCode(500, new { error = "Error during registration", details = ex.Message
-        });
-    }
+            return StatusCode(500, new
+            {
+                error = "Error during registration",
+                details = ex.Message
+            });
+        }
     }
     [HttpGet("checkUsername/{username}")]
     public IActionResult CheckUsername(string username)
@@ -154,7 +154,7 @@ public class AccountUserController :Controller
             Password = accountUserDTO.Password // Nếu cho phép thay đổi mật khẩu
         };
         // Thực hiện cập nhật thông tin người dùng
-        var result = accountUserService.UpdateAccountUser(accountUserDTO);
+        var result = accountUserService.UpdateUserProfile(updateDTO);
         if (result)
         {
             return Ok(new { status = true, message = "Profile updated successfully" });
@@ -164,6 +164,28 @@ public class AccountUserController :Controller
             return BadRequest(new { status = false, message = "Failed to update profile" });
         }
     }
+    //[HttpGet("getInfoByToken")]
+    //[Authorize]
+    //public IActionResult GetUserProfile()
+    //{
+    //    var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+    //    if (string.IsNullOrEmpty(userIdClaim))
+    //    {
+    //        return Unauthorized(new { error = "User not found" });
+    //    }
+
+    //    int userId = int.Parse(userIdClaim);
+    //    var userInfo = accountUserService.GetInfoAccountById(userId);
+
+    //    if (userInfo == null)
+    //    {
+    //        return NotFound(new { error = "Account not found" });
+    //    }
+
+    //    return Ok(userInfo);
+    //}
+
     [HttpGet("getInfoByToken")]
     [Authorize]
     public IActionResult GetUserProfile()
@@ -175,7 +197,11 @@ public class AccountUserController :Controller
             return Unauthorized(new { error = "User not found" });
         }
 
-        int userId = int.Parse(userIdClaim);
+        if (!int.TryParse(userIdClaim, out int userId))
+        {
+            return BadRequest(new { error = "Invalid User ID format" });
+        }
+
         var userInfo = accountUserService.GetInfoAccountById(userId);
 
         if (userInfo == null)
@@ -196,7 +222,7 @@ public class AccountUserController :Controller
             var userInfo = accountUserService.GetInfoAccountById(id);
 
             return Ok(userInfo);
-          
+
         }
         catch (Exception ex)
         {
@@ -274,7 +300,30 @@ public class AccountUserController :Controller
         return result ? Ok(new { status = "Account set to active successfully" })
                       : BadRequest(new { error = "Failed to set account to active" });
     }
+    //[HttpPost("loginWithGoogle")]
+    //public async Task<IActionResult> LoginWithGoogle([FromBody] string idToken)
+    //{
+    //    try
+    //    {
+    //        var payload = await GoogleJsonWebSignature.ValidateAsync(idToken, new GoogleJsonWebSignature.ValidationSettings()
+    //        {
+    //            Audience = new[] { configuration["Google:ClientId"] }
+    //        });
 
-   
+    //        if (payload != null)
+    //        {
+    //            var user = accountUserService.FindByUsername(payload.Email);
+    //            if (user != null)
+    //            {
+    //                var token = accountUserService.GenerateJSONWebToken(user.Username, user.UserId);
+    //                return Ok(new { token, userId = user.UserId });
+    //            }
+    //        }
 
+    //        return Unauthorized(new { message = "Invalid Google Token" });
+    //    }
+    //    catch (Exception ex)
+    //    {
+    //        return StatusCode(500, new { message = "An error occurred while validating Google token", details = ex.Message });
+    //    }
 }

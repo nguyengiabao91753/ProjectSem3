@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 using ProjectSem3.DTOs;
 using ProjectSem3.Hubs;
 using ProjectSem3.Models;
@@ -22,8 +23,41 @@ using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 // Read configuration file (appsettings.json)
-builder.Configuration.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
-builder.Services.AddSignalR();
+//builder.Configuration.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
+
+//AUTHORIZE HEADER
+builder.Services.AddSwaggerGen(c =>
+{
+    c.SwaggerDoc("v1", new OpenApiInfo { Title = "ProjectSemester3", Version = "v1" });
+
+    // Thêm cấu hình để Swagger hỗ trợ JWT
+    c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    {
+        Name = "Authorization",
+        Type = SecuritySchemeType.Http,
+        Scheme = "Bearer",
+        BearerFormat = "JWT",
+        In = ParameterLocation.Header,
+        Description = "Enter 'Bearer' [space] and then your valid token in the text input below.\n\nExample: \"Bearer 12345abcdef\""
+    });
+
+    c.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference
+                {
+                    Type = ReferenceType.SecurityScheme,
+                    Id = "Bearer"
+                }
+            },
+            Array.Empty<string>()
+        }
+    });
+});
+
+builder.Services.AddSignalR(); // Thêm dịch vụ SignalR
 
 // Add services to the container.
 builder.Services.AddControllers();
@@ -37,8 +71,8 @@ builder.Services.AddAuthentication(option =>
     option.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
 }).AddJwtBearer(option =>
 {
-    //option.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
-    option.TokenValidationParameters = new TokenValidationParameters
+    option.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
+    //option.TokenValidationParameters = new TokenValidationParameters
 
     {
         ValidateIssuer = true,
@@ -87,29 +121,14 @@ builder.Services.AddScoped<PolicyService, PolicyServiceImpl>();
 
 
 var app = builder.Build();
-
-app.UseCors(builder => builder
-                .AllowAnyHeader()
-                .AllowAnyMethod()
-                .SetIsOriginAllowed((host) => true)
-                .AllowCredentials()
-            );
-
-
-app.UseAuthentication(); //kích hoạt midddlewarre xác thực . Ví dụ, nó có thể đảm nhận việc kiểm tra xem người dùng đã đăng nhập chưa trước khi truy cập vào một trang hoặc tài nguyên cụ thể.
-// Validate the token
-
-app.UseAuthorization(); // kích hoạt middleware phân quyền. Ví dụ, nó có thể kiểm tra xem người dùng có quyền truy cập vào một trang hay tài nguyên cụ thể không dựa trên vai trò hoặc các yêu cầu quyền.
-// Check for user permissions/roles
-
-
-// Configure the HTTP request pipeline.
-
+// Sử dụng Developer Exception Page trong môi trường phát triển
 if (app.Environment.IsDevelopment())
 {
+    app.UseDeveloperExceptionPage();
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
 
 
 // Configure the HTTP request pipeline.
@@ -120,14 +139,23 @@ if (app.Environment.IsDevelopment())
 }
 app.UseHttpsRedirection(); // Tự động chuyển hướng sang HTTPS
 app.UseRouting(); // Cấu hình định tuyến
-app.UseCors(x => x.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader()); // Cho phép tất cả các nguồn, phương thức, và header
 
+app.UseCors(builder => builder
+                .AllowAnyHeader()
+                .AllowAnyMethod()
+                .SetIsOriginAllowed((host) => true)
+                .AllowCredentials()
+            );
 
+app.UseAuthentication(); //kích hoạt midddlewarre xác thực . Ví dụ, nó có thể đảm nhận việc kiểm tra xem người dùng đã đăng nhập chưa trước khi truy cập vào một trang hoặc tài nguyên cụ thể.
+// Validate the token
+
+app.UseAuthorization(); // kích hoạt middleware phân quyền. Ví dụ, nó có thể kiểm tra xem người dùng có quyền truy cập vào một trang hay tài nguyên cụ thể không dựa trên vai trò hoặc các yêu cầu quyền.
+// Check for user permissions/roles
 
 // Cấu hình endpoint cho SignalR
 app.MapHub<SeatHub>("/seatHub");
 
-app.UseHttpsRedirection();
 app.MapControllers();
 
 app.Run();

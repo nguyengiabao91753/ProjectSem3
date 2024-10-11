@@ -1,6 +1,8 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using ProjectSem3.DTOs;
+using ProjectSem3.Models;
+using ProjectSem3.Services.BookingService;
 using ProjectSem3.Services.PaymentService;
 using ProjectSem3.Services.PaypalService;
 using ProjectSem3.Services.VNPay;
@@ -15,14 +17,18 @@ public class PaymentController : ControllerBase
     private readonly IMapper mapper;
     private IConfiguration configuration;
     private readonly VnPayService vnPayService;
+    private readonly BookingService bookingService;
+    private readonly DatabaseContext db;
 
-    public PaymentController(PaymentService _paymentService, PaypalService _paypalService, IMapper _mapper, IConfiguration _configuration, VnPayService _vnPayService)
+    public PaymentController(PaymentService _paymentService, PaypalService _paypalService, IMapper _mapper, IConfiguration _configuration, VnPayService _vnPayService, BookingService _bookingService, DatabaseContext _db)
     {
         paymentService = _paymentService;
         paypalService = _paypalService;
         mapper = _mapper;
         configuration = _configuration;
         vnPayService = _vnPayService;
+        bookingService = _bookingService;
+        db = _db;
     }
 
     [HttpGet("get-all-payment")]
@@ -115,7 +121,7 @@ public class PaymentController : ControllerBase
         // Tạo model cho VnPay với thông tin booking
         var paymentRequest = new VnPaymentRequestModel
         {
-            Amount = totalAmount,
+            Amount = totalAmount * 25000,
             CreatedDate = DateTime.Now,
             OrderId = bookingId,
             FullName = bookingRequest.BookingDTO.FullName,
@@ -125,10 +131,19 @@ public class PaymentController : ControllerBase
         // Tạo URL thanh toán với VnPay
         var paymentUrl = vnPayService.CreatePaymentUrl(HttpContext, paymentRequest);
 
-        return Ok(new
+        var result = bookingService.Create(bookingRequest.BookingDTO, bookingRequest.BookingDetailDTOs, "VNPay");
+
+        if (result)
         {
-            PaymentUrl = paymentUrl
-        });
+            return Ok(new
+            {
+                PaymentUrl = paymentUrl,
+            });
+        }
+        else
+        {
+            return StatusCode(500, "Failed to create payment.");
+        }
     }
 
     [HttpGet("payment-callback")]
@@ -141,11 +156,9 @@ public class PaymentController : ControllerBase
             return BadRequest("Payment failed or invalid signature");
         }
 
-        return Ok(new
-        {
-            Success = true,
-            Message = "Payment successful"
-        });
+
+        return Redirect("http://localhost:4200/thanks");
+
     }
 }
 

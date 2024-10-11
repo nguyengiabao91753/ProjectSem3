@@ -32,7 +32,7 @@ public class AccountUserServiceImpl(DatabaseContext db, IMapper mapper, IConfigu
             var user = mapper.Map<User>(accountUserDTO);
             user.CreatedAt = DateTime.Now;
 
-            db.Users.Add(user);  
+            db.Users.Add(user);
             db.SaveChanges();
 
             var account = mapper.Map<Account>(accountUserDTO);
@@ -45,11 +45,11 @@ public class AccountUserServiceImpl(DatabaseContext db, IMapper mapper, IConfigu
         }
         catch (Exception ex)
         {
-        transaction.Rollback();
-        Console.WriteLine($"Error during account creation: {ex.Message}");
-        return false;
+            transaction.Rollback();
+            Console.WriteLine($"Error during account creation: {ex.Message}");
+            return false;
         }
-        
+
     }
 
     public string GenerateJSONWebToken(string username, int userId)
@@ -61,12 +61,14 @@ public class AccountUserServiceImpl(DatabaseContext db, IMapper mapper, IConfigu
         {
             Subject = new ClaimsIdentity(new[]
             {
-            new Claim(JwtRegisteredClaimNames.Name, username),
-            new Claim(ClaimTypes.NameIdentifier, userId.ToString())
+                new Claim(JwtRegisteredClaimNames.Name, username),
+                new Claim(ClaimTypes.NameIdentifier, userId.ToString())
+                    //new Claim("userId", userId.ToString()) // Use custom claim name 'userId'
+
         }),
+            Expires = DateTime.UtcNow.AddMinutes(10),
             Issuer = issuer,
             Audience = audience,
-            Expires = DateTime.UtcNow.AddMinutes(60),
             SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha512)
         };
         var tokenHandler = new JwtSecurityTokenHandler();
@@ -78,24 +80,41 @@ public class AccountUserServiceImpl(DatabaseContext db, IMapper mapper, IConfigu
 
     public AccountUserDTO GetInfoAccountById(int id)
     {
-        var account = db.Accounts
-            .Include(a => a.AccountNavigation)
-            .FirstOrDefault(a => a.AccountId == id);
-
-        if (account == null) return null;
-
-        return new AccountUserDTO
+        try
         {
-            UserId = account.AccountNavigation.UserId,
-            Username = account.Username,
-            FullName = account.AccountNavigation.FullName,
-            Email = account.AccountNavigation.Email,
-            PhoneNumber = account.AccountNavigation.PhoneNumber,
-            BirthDate = account.AccountNavigation.BirthDate.ToString("dd-MM-yyyy"), // Ensure formatting here
-            Address = account.AccountNavigation.Address,
-            Status = account.Status,
-            LevelId = account.LevelId,
-        };
+            var account = db.Accounts
+                .Include(a => a.AccountNavigation)
+                .FirstOrDefault(a => a.AccountId == id);
+
+            if (account == null)
+            {
+                return null;
+            }
+
+            if (account.AccountNavigation == null)
+            {
+                Console.WriteLine($"No User associated with AccountId {id}");
+                return null;
+            }
+
+            return new AccountUserDTO
+            {
+                UserId = account.AccountNavigation.UserId,
+                Username = account.Username,
+                FullName = account.AccountNavigation.FullName,
+                Email = account.AccountNavigation.Email,
+                PhoneNumber = account.AccountNavigation.PhoneNumber,
+                BirthDate = account.AccountNavigation.BirthDate.ToString("dd-MM-yyyy"),
+                Address = account.AccountNavigation.Address,
+                Status = account.Status,
+                LevelId = account.LevelId,
+            };
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error in GetInfoAccountById: {ex.Message}");
+            return null;
+        }
     }
 
 
@@ -118,7 +137,6 @@ public class AccountUserServiceImpl(DatabaseContext db, IMapper mapper, IConfigu
             currentAccount.Status = accountUserDTO.Status;
             currentAccount.LevelId = accountUserDTO.LevelId;
 
-            // Hash lại mật khẩu nếu có thay đổi
             if (!string.IsNullOrEmpty(accountUserDTO.Password))
             {
                 currentAccount.Password = BCrypt.Net.BCrypt.HashPassword(accountUserDTO.Password);
@@ -131,16 +149,13 @@ public class AccountUserServiceImpl(DatabaseContext db, IMapper mapper, IConfigu
             user.PhoneNumber = accountUserDTO.PhoneNumber;
             user.Address = accountUserDTO.Address;
 
-            // Đánh dấu là đã thay đổi
             db.Entry(currentAccount).State = EntityState.Modified;
             db.Entry(user).State = EntityState.Modified;
 
-            // Lưu thay đổi
             return db.SaveChanges() > 0;
         }
         catch (Exception ex)
         {
-            // Ghi log lỗi nếu cần
             Console.WriteLine($"Error during update: {ex.Message}");
             return false;
         }
@@ -212,21 +227,20 @@ public class AccountUserServiceImpl(DatabaseContext db, IMapper mapper, IConfigu
 
     public AccountUserDTO Login(string username, string password)
     {
-        // Tìm account dựa trên username
         var account = db.Accounts.FirstOrDefault(a => a.Username == username);
         if (account == null)
         {
-            // Không tìm thấy tài khoản
             return null;
         }
-        // Kiểm tra account và mật khẩu
-        if (account == null || string.IsNullOrEmpty(account.Password) ||
-            !BCrypt.Net.BCrypt.Verify(password, account.Password))
+        //if (account == null || string.IsNullOrEmpty(account.Password) ||
+        //    !BCrypt.Net.BCrypt.Verify(password, account.Password))
+        //{
+        //    return null;
+        //}
+        if (!BCrypt.Net.BCrypt.Verify(password, account.Password))
         {
-            return null; // Trả về null hoặc một thông báo lỗi tùy theo yêu cầu của bạn
+            return null;
         }
-
-        // Nếu tài khoản và mật khẩu hợp lệ, trả về đối tượng AccountDTO
         return mapper.Map<AccountUserDTO>(account);
     }
 
@@ -260,9 +274,13 @@ public class AccountUserServiceImpl(DatabaseContext db, IMapper mapper, IConfigu
         }
     }
 
-    public Account FindByUsername(string username)
+    public AccountUserDTO FindByUsername(string username)
     {
-        return db.Accounts.FirstOrDefault(a => a.Username == username);
+        var account = db.Accounts.Include(a => a.AccountNavigation)
+                                 .FirstOrDefault(a => a.Username == username);
+        if (account == null) return null;
+
+        return mapper.Map<AccountUserDTO>(account);
     }
 
     public bool InActiveAccount(AccountUserDTO accountUserDTO)
