@@ -12,6 +12,8 @@ public class BusesTripDTO
     public byte AirConditioned { get; set; }
 
     public int SeatCount { get; set; }
+
+    public string? LicensePlate { get; set; }   
     //.
 
     public int TripId { get; set; }

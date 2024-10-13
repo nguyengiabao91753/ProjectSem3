@@ -3,12 +3,11 @@ using Microsoft.AspNetCore.Mvc;
 using ProjectSem3.DTOs;
 using ProjectSem3.Services.AccountService;
 using System.Security.Claims;
-using Google.Apis.Auth;
 
 namespace ProjectSem3.Controllers;
 [Route("api/accountUser")]
 
-public class AccountUserController :Controller
+public class AccountUserController : Controller
 {
     private AccountUserService accountUserService;
     private IConfiguration configuration;
@@ -34,6 +33,7 @@ public class AccountUserController :Controller
             }
 
             var existingAccount = accountUserService.FindByUsername(accountUserDTO.Username);   
+
             if (existingAccount != null)
             {
                 return BadRequest(new { error = "Username already exists" });
@@ -44,24 +44,27 @@ public class AccountUserController :Controller
 
             bool result = accountUserService.CreateAccountUser(accountUserDTO);
 
-                if (result)
-                {
-                    return Ok(new {status = "Account created successfully" });
+            if (result)
+            {
+                return Ok(new { status = "Account created successfully" });
 
-                }
-                else
-                {
-                    return BadRequest(new { error = "Error during account creation" });
-
-                }
             }
-          
-         catch (Exception ex)
+            else
+            {
+                return BadRequest(new { error = "Error during account creation" });
+
+            }
+        }
+
+        catch (Exception ex)
         {
             Console.WriteLine("Error during account creation: " + ex.Message);
-            return StatusCode(500, new { error = "Error during registration", details = ex.Message
-        });
-    }
+            return StatusCode(500, new
+            {
+                error = "Error during registration",
+                details = ex.Message
+            });
+        }
     }
 
     [Consumes("application/json")]
@@ -177,6 +180,29 @@ public class AccountUserController :Controller
         }
     }
     
+
+    //[HttpGet("getInfoByToken")]
+    //[Authorize]
+    //public IActionResult GetUserProfile()
+    //{
+    //    var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+    //    if (string.IsNullOrEmpty(userIdClaim))
+    //    {
+    //        return Unauthorized(new { error = "User not found" });
+    //    }
+
+    //    int userId = int.Parse(userIdClaim);
+    //    var userInfo = accountUserService.GetInfoAccountById(userId);
+
+    //    if (userInfo == null)
+    //    {
+    //        return NotFound(new { error = "Account not found" });
+    //    }
+
+    //    return Ok(userInfo);
+    //}
+
     [HttpGet("getInfoByToken")]
     [Authorize]
     public IActionResult GetUserProfile()
@@ -234,7 +260,7 @@ public class AccountUserController :Controller
             var userInfo = accountUserService.GetInfoAccountById(id);
 
             return Ok(userInfo);
-          
+
         }
         catch (Exception ex)
         {
@@ -375,6 +401,14 @@ public class AccountUserController :Controller
             status = accountUserDTO.Status
         });
     }
+    //        return Unauthorized(new { message = "Invalid Google Token" });
+    //    }
+    //    catch (Exception ex)
+    //    {
+    //        return StatusCode(500, new { message = "An error occurred while validating Google token", details = ex.Message });
+    //    }
+    //}
+
 
 
 

@@ -188,3 +188,8 @@ CREATE TABLE CustomerFeedback (
     Content TEXT,
     FeedbackDate DATETIME NOT NULL
 );
+
+
+SELECT * FROM Trips b
+WHERE DateStart <= GETDATE() -- Lấy thời gian hiện tại
+

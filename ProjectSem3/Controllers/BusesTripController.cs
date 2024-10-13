@@ -82,6 +82,27 @@ public class BusesTripController : Controller
 
     [Consumes("application/json")]
     [Produces("application/json")]
+    [HttpGet("getallactive")]
+    public IActionResult GetAllActive()
+    {
+        try
+        {
+            var result = busesTripService.GetAllActive();
+
+            return Ok(result);
+
+
+
+            throw new Exception();
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(ex.Message);
+        }
+    }
+
+    [Consumes("application/json")]
+    [Produces("application/json")]
     [HttpPost("getbyid")]
     public IActionResult GetById([FromBody] int id)
     {

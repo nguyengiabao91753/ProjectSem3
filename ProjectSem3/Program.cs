@@ -1,13 +1,17 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 using ProjectSem3.DTOs;
 using ProjectSem3.Hubs;
+using ProjectSem3.Jobs;
 using ProjectSem3.Models;
 using ProjectSem3.Services.AccountService;
 using ProjectSem3.Services.AgeGroupService;
+using ProjectSem3.Services.BookingService;
 using ProjectSem3.Services.BusesSeatService;
 using ProjectSem3.Services.BusesTripService;
+using ProjectSem3.Services.BusSeatandTripUpdate;
 using ProjectSem3.Services.BusService;
 using ProjectSem3.Services.BusTypeService;
 using ProjectSem3.Services.LevelService;
@@ -16,13 +20,45 @@ using ProjectSem3.Services.PaymentService;
 using ProjectSem3.Services.PaypalService;
 using ProjectSem3.Services.PolicyService;
 using ProjectSem3.Services.TripService;
+using ProjectSem3.Services.VNPay;
+using Quartz;
 using System.Text;
-using Microsoft.Extensions.Options;
-using ProjectSem3.Services.BookingService;
 
 var builder = WebApplication.CreateBuilder(args);
 // Read configuration file (appsettings.json)
 //builder.Configuration.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
+
+//AUTHORIZE HEADER
+builder.Services.AddSwaggerGen(c =>
+{
+    c.SwaggerDoc("v1", new OpenApiInfo { Title = "ProjectSemester3", Version = "v1" });
+
+    // Thêm cấu hình để Swagger hỗ trợ JWT
+    c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    {
+        Name = "Authorization",
+        Type = SecuritySchemeType.Http,
+        Scheme = "Bearer",
+        BearerFormat = "JWT",
+        In = ParameterLocation.Header,
+        Description = "Enter 'Bearer' [space] and then your valid token in the text input below.\n\nExample: \"Bearer 12345abcdef\""
+    });
+
+    c.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference
+                {
+                    Type = ReferenceType.SecurityScheme,
+                    Id = "Bearer"
+                }
+            },
+            Array.Empty<string>()
+        }
+    });
+});
 
 builder.Services.AddSignalR(); // Thêm dịch vụ SignalR
 
@@ -80,11 +116,28 @@ builder.Services.AddScoped<BusesSeatService, BusesSeatServiceImpl>();
 builder.Services.AddScoped<PaymentService, PaymentServiceImpl>();
 builder.Services.AddScoped<PaypalService>();
 builder.Services.AddScoped<BookingServiceImpl>();
-
+builder.Services.AddScoped<VnPayService, VnPayServiceImpl>();
 //builder.Services.TryAddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
 builder.Services.AddScoped<PolicyService, PolicyServiceImpl>();
 
+
+builder.Services.AddHostedService<BusSeatandTripUpdate>();
+
+builder.Services.AddQuartz(q =>
+{
+    q.UseMicrosoftDependencyInjectionJobFactory();
+
+    var jobKey = new JobKey("TripSeatStatusJob");
+    q.AddJob<TripSeatStatusJob>(opts => opts.WithIdentity(jobKey));
+
+    q.AddTrigger(opts => opts
+        .ForJob(jobKey)
+        .WithIdentity("TripSeatStatusTrigger")
+        .WithCronSchedule("0 0 * * * ?")); // Chạy mỗi giờ
+});
+
+builder.Services.AddQuartzHostedService(q => q.WaitForJobsToComplete = true);
 
 
 var app = builder.Build();
