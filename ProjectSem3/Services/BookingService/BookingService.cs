@@ -27,4 +27,7 @@ public interface BookingService
     public Booking getBookingById(int id);
 
     public bool UseTicket(string ticketCode);
+
+    public List<BookingDTO> GetAllByEmail(string email);
+
 }

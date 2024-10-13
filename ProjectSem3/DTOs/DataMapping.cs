@@ -32,10 +32,13 @@ public class DataMapping : Profile
             s => s.MapFrom(s => s.Trip.ArrivalLocation.Name)
             ).ForMember(
             d => d.DateStart,
-            s => s.MapFrom(s => s.Trip.DateStart)
+            s => s.MapFrom(s => s.Trip.DateStart.ToString("HH:mm:ss dd/MM/yyyy"))
             ).ForMember(
             d => d.DateEnd,
-            s => s.MapFrom(s => s.Trip.DateEnd)
+            s => s.MapFrom(s => s.Trip.DateEnd.ToString("HH:mm:ss dd/MM/yyyy"))
+            ).ForMember(
+            d=>d.LicensePlate,
+            s=>s.MapFrom(s=>s.Bus.LicensePlate)
             );
         CreateMap<BusesTripDTO, BusesTrip>();
 

@@ -68,7 +68,7 @@ public class BookingController : Controller
         try
         {
             var detail = bookingService.getBookingDetailByTicketCode(ticketcode);
-            var booking = bookingService.getBookingById(detail.BookingId);
+            
             if (detail == null)
             {
                 return Ok(new
@@ -76,6 +76,7 @@ public class BookingController : Controller
                     status = false
                 });
             }
+            var booking = bookingService.getBookingById(detail.BookingId);
             return Ok(new
             {
                 status = true,
@@ -118,6 +119,39 @@ public class BookingController : Controller
             });
 
 
+
+            throw new Exception();
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(ex.Message);
+        }
+    }
+
+
+    [Consumes("application/json")]
+    [Produces("application/json")]
+    [HttpGet("getbookingbyemail/{email}")]
+    public IActionResult GetBookingByEmail(string email)
+    {
+        try
+        {
+            var bookings = bookingService.GetAllByEmail(email);
+            var detail = bookingService.GetAllDetail();
+            if (bookings == null)
+            {
+                return Ok(new
+                {
+                    status = false
+                });
+            }
+            return Ok(new
+            {
+                status = true,
+                bookings = bookings,
+                data = detail
+            }
+            );
 
             throw new Exception();
         }
