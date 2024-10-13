@@ -32,7 +32,7 @@ public class AccountUserServiceImpl(DatabaseContext db, IMapper mapper, IConfigu
             var user = mapper.Map<User>(accountUserDTO);
             user.CreatedAt = DateTime.Now;
 
-            db.Users.Add(user);  
+            db.Users.Add(user);
             db.SaveChanges();
 
             var account = mapper.Map<Account>(accountUserDTO);
@@ -45,11 +45,11 @@ public class AccountUserServiceImpl(DatabaseContext db, IMapper mapper, IConfigu
         }
         catch (Exception ex)
         {
-        transaction.Rollback();
-        Console.WriteLine($"Error during account creation: {ex.Message}");
-        return false;
+            transaction.Rollback();
+            Console.WriteLine($"Error during account creation: {ex.Message}");
+            return false;
         }
-        
+
     }
 
     public string GenerateJSONWebToken(string username, int userId)
