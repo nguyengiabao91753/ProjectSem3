@@ -148,13 +148,14 @@ public class DataMapping : Profile
             d=> d.LevelId,
             s=> s.MapFrom(s=> s.LevelId)
             );
+
         CreateMap<AccountUserDTO, User>()
             .ForMember(
             d => d.FullName,
             s => s.MapFrom(s => s.FullName))
             .ForMember(
             d => d.BirthDate,
-            s => s.MapFrom(s => DateTime.ParseExact(s.BirthDate, "dd-MM-yyyy", CultureInfo.InvariantCulture))
+            s => s.MapFrom(s => DateTime.ParseExact(s.BirthDate, "dd/MM/yyyy", CultureInfo.InvariantCulture))
             ).ForMember(
             d => d.Email,
             s => s.MapFrom(s => s.Email)

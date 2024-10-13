@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Google.Apis.Auth;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using ProjectSem3.DTOs;
@@ -52,6 +53,48 @@ public class AccountUserServiceImpl(DatabaseContext db, IMapper mapper, IConfigu
         
     }
 
+    public bool CreateAccountUserGg(AccountUserDTO accountUserDTO)
+    {
+        using var transaction = databaseContext.Database.BeginTransaction(); // Dùng transaction để đảm bảo dữ liệu an toàn
+
+        try
+        {
+            var existingAccount = databaseContext.Accounts.FirstOrDefault(a => a.Username == accountUserDTO.Username);
+            if (existingAccount != null)
+            {
+                return true; // Nếu tài khoản đã tồn tại, không cần tạo mới
+            }
+            // Đặt mật khẩu mặc định và các giá trị khác nếu chưa có
+            accountUserDTO.Password = BCrypt.Net.BCrypt.HashPassword("123"); // Mật khẩu mặc định là "123"
+            accountUserDTO.Status = 1; // Đặt trạng thái mặc định (có thể là active)
+            accountUserDTO.LevelId = 3; // Đặt level mặc định (tùy vào yêu cầu của bạn)
+
+            // Tạo đối tượng User từ AccountUserDTO
+            var user = mapper.Map<User>(accountUserDTO);
+            user.CreatedAt = DateTime.Now;
+
+            // Thêm người dùng vào bảng Users
+            databaseContext.Users.Add(user);
+            databaseContext.SaveChanges();
+
+            // Tạo đối tượng Account từ AccountUserDTO và liên kết với User
+            var account = mapper.Map<Account>(accountUserDTO);
+            account.AccountId = user.UserId;
+
+            databaseContext.Accounts.Add(account);
+            databaseContext.SaveChanges();
+
+            transaction.Commit();
+            return true;
+        }
+        catch (Exception ex)
+        {
+            transaction.Rollback();
+            Console.WriteLine($"Error during account creation: {ex.Message}");
+            return false;
+        }
+    }
+    
     public string GenerateJSONWebToken(string username, int userId)
     {
         var issuer = configuration["Jwt:Issuer"];
@@ -75,7 +118,6 @@ public class AccountUserServiceImpl(DatabaseContext db, IMapper mapper, IConfigu
         var token = tokenHandler.CreateToken(tokenDescriptor);
         return tokenHandler.WriteToken(token);
     }
-
 
 
     public AccountUserDTO GetInfoAccountById(int id)
@@ -144,7 +186,7 @@ public class AccountUserServiceImpl(DatabaseContext db, IMapper mapper, IConfigu
 
             // Cập nhật thông tin người dùng (User)
             user.FullName = accountUserDTO.FullName;
-            user.BirthDate = DateTime.ParseExact(accountUserDTO.BirthDate, "dd-MM-yyyy", CultureInfo.InvariantCulture);
+            user.BirthDate = DateTime.ParseExact(accountUserDTO.BirthDate, "dd/MM/yyyy", CultureInfo.InvariantCulture);
             user.Email = accountUserDTO.Email;
             user.PhoneNumber = accountUserDTO.PhoneNumber;
             user.Address = accountUserDTO.Address;
@@ -200,7 +242,6 @@ public class AccountUserServiceImpl(DatabaseContext db, IMapper mapper, IConfigu
         }
     }
 
-
     public List<AccountUserDTO> GetAllAccountUserInfo()
     {
         var accountUserInfo = (from account in db.Accounts
@@ -224,7 +265,6 @@ public class AccountUserServiceImpl(DatabaseContext db, IMapper mapper, IConfigu
     }
 
 
-
     public AccountUserDTO Login(string username, string password)
     {
         var account = db.Accounts.FirstOrDefault(a => a.Username == username);
@@ -232,18 +272,13 @@ public class AccountUserServiceImpl(DatabaseContext db, IMapper mapper, IConfigu
         {
             return null;
         }
-        //if (account == null || string.IsNullOrEmpty(account.Password) ||
-        //    !BCrypt.Net.BCrypt.Verify(password, account.Password))
-        //{
-        //    return null;
-        //}
+
         if (!BCrypt.Net.BCrypt.Verify(password, account.Password))
         {
             return null;
         }
         return mapper.Map<AccountUserDTO>(account);
     }
-
 
 
     public bool DeleteAccountUser(int id)
@@ -330,4 +365,87 @@ public class AccountUserServiceImpl(DatabaseContext db, IMapper mapper, IConfigu
             return false;
         }
     }
+
+    public AccountUserDTO FindByEmail(string email)
+    {
+        try
+        {
+            var account = databaseContext.Accounts.Include(a => a.AccountNavigation)
+                                                   .FirstOrDefault(a => a.AccountNavigation.Email == email);
+            if (account == null)
+            {
+                return null;
+            }
+
+            return mapper.Map<AccountUserDTO>(account);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error in FindByEmail: {ex.Message}");
+            return null;
+        }
+    }
+    public async Task<GoogleJsonWebSignature.Payload> VerifyGoogleToken(string idToken)
+    {
+        try
+        {
+            var settings = new GoogleJsonWebSignature.ValidationSettings()
+            {
+                Audience = new List<string>() { configuration["GoogleAuthSettings:ClientId"] }
+            };
+            var payload = await GoogleJsonWebSignature.ValidateAsync(idToken, settings);
+            return payload;
+        }
+        catch
+        {
+            return null;
+        }
+    }
+
+    public async Task<AccountUserDTO> GetOrCreateUserFromGoogleAsync(GoogleJsonWebSignature.Payload payload)
+    {
+        // Kiểm tra xem người dùng đã tồn tại trong database chưa
+        var account = db.Accounts.Include(a => a.AccountNavigation)
+                     .FirstOrDefault(a => a.Username == payload.Email);
+
+        if (account == null)
+        {
+            // Tạo người dùng mới
+            var user = new User
+            {
+                FullName = payload.Name,
+                Email = payload.Email,
+                CreatedAt = DateTime.Now
+            };
+            db.Users.Add(user);
+            db.SaveChanges();
+
+            account = new Account
+            {
+                AccountId = user.UserId,
+                Username = payload.Email,
+                LevelId = 3, // LevelId = 3 là passenger
+                Status = 1
+            };
+            db.Accounts.Add(account);
+            db.SaveChanges();
+        }
+
+        // Map dữ liệu sang DTO
+        var accountUserDTO = new AccountUserDTO
+        {
+            UserId = account.AccountId,
+            Username = account.Username,
+            FullName = account.AccountNavigation.FullName,
+            Email = account.AccountNavigation.Email,
+            PhoneNumber = account.AccountNavigation.PhoneNumber,
+            BirthDate = account.AccountNavigation.BirthDate.ToString("dd-MM-yyyy"),
+            Address = account.AccountNavigation.Address,
+            Status = account.Status,
+            LevelId = account.LevelId
+        };
+
+        return accountUserDTO;
+    }
+
 }
