@@ -1,5 +1,8 @@
 ﻿namespace ProjectSem3.DTOs;
-
+public class GoogleLoginDTO
+{
+    public string IdToken { get; set; }
+}
 public class LevelDTO
 {
     public int LevelId { get; set; }
@@ -41,6 +44,7 @@ public class LoginDTO
     public string? Password { get; set; }
 
 }
+
 public class AccountDTO
 {
     public int AccountId { get; set; }

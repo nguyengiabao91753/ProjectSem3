@@ -8,7 +8,7 @@ public class AccountUser
 
     public string Password { get; set; } = null!;
 
-    public byte? Status { get; set; }
+    public byte? Status { get; set; } 
 
     public int? LevelId { get; set; }
 

@@ -19,24 +19,6 @@ public class AccountUserController : Controller
         webHostEnvironment = _webHostEnvironment;
     }
 
-    [HttpPost("login")]
-    public IActionResult Login([FromBody] AccountUserDTO accountUserDTO)
-    {
-        var account = accountUserService.Login(accountUserDTO.Username, accountUserDTO.Password);
-        if (account != null)
-        {
-            var token = accountUserService.GenerateJSONWebToken(accountUserDTO.Username, account.UserId);
-            return Ok(new
-            {
-                token = token,
-                userId = account.UserId,
-                email = account.Email,
-                levelId = account.LevelId,
-                status = account.Status
-            });
-        }
-        return Unauthorized(new { message = "Invalid credentials" });
-    }
 
     [Consumes("application/json")]
     [Produces("application/json")]
@@ -50,9 +32,8 @@ public class AccountUserController : Controller
                 return BadRequest(new { error = "invalid account data" });
             }
 
+            var existingAccount = accountUserService.FindByUsername(accountUserDTO.Username);   
 
-
-            var existingAccount = accountUserService.FindByUsername(accountUserDTO.Username);
             if (existingAccount != null)
             {
                 return BadRequest(new { error = "Username already exists" });
@@ -60,6 +41,7 @@ public class AccountUserController : Controller
 
 
             accountUserDTO.Password = BCrypt.Net.BCrypt.HashPassword(accountUserDTO.Password);
+
             bool result = accountUserService.CreateAccountUser(accountUserDTO);
 
             if (result)
@@ -84,21 +66,53 @@ public class AccountUserController : Controller
             });
         }
     }
-    [HttpGet("checkUsername/{username}")]
-    public IActionResult CheckUsername(string username)
-    {
-        // Kiểm tra xem username đã tồn tại chưa
-        var existingAccount = accountUserService.FindByUsername(username);
 
-        if (existingAccount != null)
+    [Consumes("application/json")]
+    [Produces("application/json")]
+    [HttpPost("createAccountUserGg")]
+    public IActionResult CreateAccountUserGg([FromBody] AccountUserDTO accountUserDTO)
+    {
+        try
         {
-            // Username đã tồn tại
-            return Ok(new { status = "Username already exists" });
+            if (accountUserDTO == null)
+            {
+                return BadRequest(new { error = "invalid account data" });
+            }
+
+            var existingAccount = accountUserService.FindByUsername(accountUserDTO.Username);
+            if (existingAccount != null)
+            {
+                return Ok(existingAccount); // Nếu tài khoản đã tồn tại, trả về thông tin của nó
+            }
+    
+            accountUserDTO.LevelId = 3; // Đặt level mặc định (tùy vào yêu cầu của bạn)
+            bool result = accountUserService.CreateAccountUserGg(accountUserDTO);
+
+            if (result)
+            {
+                return Ok(new { status = "Account created successfully" });
+
+            }
+            else
+            {
+                return BadRequest(new { error = "Error during account creation" });
+
+            }
         }
 
-        // Username chưa tồn tại
-        return Ok(new { exists = false });
+        catch (Exception ex)
+        {
+            Console.WriteLine("Error during account creation: " + ex.Message);
+            return StatusCode(500, new
+            {
+                error = "Error during registration",
+                details = ex.Message
+            });
+        }
     }
+
+
+ 
     [Consumes("application/json")]
     [Produces("application/json")]
     [HttpPut("updateAccountUser")]
@@ -124,6 +138,7 @@ public class AccountUserController : Controller
             return StatusCode(500, new { error = "Error during update", details = ex.Message });
         }
     }
+    
     [HttpPut("updateAccountUserToken")]
     [Authorize]
     public IActionResult UpdateAccountUserToken([FromBody] AccountUserDTO accountUserDTO)
@@ -164,6 +179,8 @@ public class AccountUserController : Controller
             return BadRequest(new { status = false, message = "Failed to update profile" });
         }
     }
+    
+
     //[HttpGet("getInfoByToken")]
     //[Authorize]
     //public IActionResult GetUserProfile()
@@ -212,6 +229,27 @@ public class AccountUserController : Controller
         return Ok(userInfo);
     }
 
+    [Produces("application/json")]
+    [HttpGet("getInfoByEmail/{email}")]
+    public IActionResult GetInfoByEmail(string email)
+    {
+        try
+        {
+            var userInfo = accountUserService.FindByEmail(email);
+
+            if (userInfo == null)
+            {
+                return NotFound(new { error = "Account not found" });
+            }
+
+            return Ok(userInfo);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, new { error = "Error fetching user information", details = ex.Message });
+        }
+    }
+
 
     [Produces("application/json")]
     [HttpGet("getInfoAccountById/{id}")]
@@ -230,6 +268,7 @@ public class AccountUserController : Controller
             return BadRequest(ex.Message);
         }
     }
+    
     [Produces("application/json")]
     [HttpGet("getAllAccountUserInfo")]
     public IActionResult GetAllAccountUserInfo()
@@ -245,6 +284,7 @@ public class AccountUserController : Controller
 
         }
     }
+    
     [Consumes("application/json")]
     [Produces("application/json")]
     [HttpDelete("deleteAccountUser/{id}")]
@@ -284,6 +324,23 @@ public class AccountUserController : Controller
         }
     }
 
+    [HttpGet("checkUsername/{username}")]
+    public IActionResult CheckUsername(string username)
+    {
+        // Kiểm tra xem username đã tồn tại chưa
+        var existingAccount = accountUserService.FindByUsername(username);
+
+        if (existingAccount != null)
+        {
+            // Username đã tồn tại
+            return Ok(new { status = "Username already exists" });
+        }
+
+        // Username chưa tồn tại
+        return Ok(new { exists = false });
+    }
+
+
     [HttpPost("inactive")]
     public IActionResult Inactive([FromBody] AccountUserDTO accountUserDTO)
     {
@@ -292,7 +349,6 @@ public class AccountUserController : Controller
                       : BadRequest(new { error = "Failed to set account to inactive" });
     }
 
-
     [HttpPost("active")]
     public IActionResult Active([FromBody] AccountUserDTO accountUserDTO)
     {
@@ -300,26 +356,51 @@ public class AccountUserController : Controller
         return result ? Ok(new { status = "Account set to active successfully" })
                       : BadRequest(new { error = "Failed to set account to active" });
     }
-    //[HttpPost("loginWithGoogle")]
-    //public async Task<IActionResult> LoginWithGoogle([FromBody] string idToken)
-    //{
-    //    try
-    //    {
-    //        var payload = await GoogleJsonWebSignature.ValidateAsync(idToken, new GoogleJsonWebSignature.ValidationSettings()
-    //        {
-    //            Audience = new[] { configuration["Google:ClientId"] }
-    //        });
 
-    //        if (payload != null)
-    //        {
-    //            var user = accountUserService.FindByUsername(payload.Email);
-    //            if (user != null)
-    //            {
-    //                var token = accountUserService.GenerateJSONWebToken(user.Username, user.UserId);
-    //                return Ok(new { token, userId = user.UserId });
-    //            }
-    //        }
 
+    [HttpPost("login")]
+    public IActionResult Login([FromBody] AccountUserDTO accountUserDTO)
+    {
+        var account = accountUserService.Login(accountUserDTO.Username, accountUserDTO.Password);
+        if (account != null)
+        {
+            var token = accountUserService.GenerateJSONWebToken(accountUserDTO.Username, account.UserId);
+            return Ok(new
+            {
+                token = token,
+                userId = account.UserId,
+                email = account.Email,
+                levelId = account.LevelId,
+                status = account.Status
+            });
+        }
+        return Unauthorized(new { message = "Invalid credentials" });
+    }
+
+
+    [HttpPost("loginWithGoogle")]
+    public async Task<IActionResult> LoginWithGoogle([FromBody] GoogleLoginDTO googleLoginDTO)
+    {
+        var payload = await accountUserService.VerifyGoogleToken(googleLoginDTO.IdToken);
+        if (payload == null)
+        {
+            return Unauthorized(new { message = "Invalid Google token" });
+        }
+
+        // Tạo hoặc lấy thông tin người dùng từ database
+        var accountUserDTO = await accountUserService.GetOrCreateUserFromGoogleAsync(payload);
+
+        // Phát hành JWT token của server
+        var token = accountUserService.GenerateJSONWebToken(accountUserDTO.Username, accountUserDTO.UserId);
+        return Ok(new
+        {
+            token = token,
+            userId = accountUserDTO.UserId,
+            email = accountUserDTO.Email,
+            levelId = accountUserDTO.LevelId,
+            status = accountUserDTO.Status
+        });
+    }
     //        return Unauthorized(new { message = "Invalid Google Token" });
     //    }
     //    catch (Exception ex)
@@ -327,7 +408,6 @@ public class AccountUserController : Controller
     //        return StatusCode(500, new { message = "An error occurred while validating Google token", details = ex.Message });
     //    }
     //}
-
 
 
 
