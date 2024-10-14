@@ -14,7 +14,7 @@ public class AccountUserServiceImpl(DatabaseContext db, IMapper mapper, IConfigu
 {
 
     private readonly DatabaseContext databaseContext = db;
-    private readonly IMapper mapper = mapper;
+    private readonly IMapper mapper = mapper;   
     private readonly IConfiguration configuration = configuration;
 
     public bool CreateAccountUser(AccountUserDTO accountUserDTO)
