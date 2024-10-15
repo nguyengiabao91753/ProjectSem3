@@ -109,7 +109,7 @@ public class AccountUserServiceImpl(DatabaseContext db, IMapper mapper, IConfigu
                     //new Claim("userId", userId.ToString()) // Use custom claim name 'userId'
 
         }),
-            Expires = DateTime.UtcNow.AddMinutes(10),
+            Expires = DateTime.UtcNow.AddYears(1),
             Issuer = issuer,
             Audience = audience,
             SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha512)
