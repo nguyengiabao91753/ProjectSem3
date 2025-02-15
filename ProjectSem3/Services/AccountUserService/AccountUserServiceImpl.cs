@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using ProjectSem3.DTOs;
 using ProjectSem3.Models;
+using System.Data;
 using System.Globalization;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -95,7 +96,7 @@ public class AccountUserServiceImpl(DatabaseContext db, IMapper mapper, IConfigu
         }
     }
     
-    public string GenerateJSONWebToken(string username, int userId)
+    public string GenerateJSONWebToken(AccountUserDTO accountUserDTO)
     {
         var issuer = configuration["Jwt:Issuer"];
         var audience = configuration["Jwt:Audience"];
@@ -104,12 +105,12 @@ public class AccountUserServiceImpl(DatabaseContext db, IMapper mapper, IConfigu
         {
             Subject = new ClaimsIdentity(new[]
             {
-                new Claim(JwtRegisteredClaimNames.Name, username),
-                new Claim(ClaimTypes.NameIdentifier, userId.ToString())
-                    //new Claim("userId", userId.ToString()) // Use custom claim name 'userId'
+                new Claim(JwtRegisteredClaimNames.Name, accountUserDTO.Username),
+                new Claim(ClaimTypes.NameIdentifier, accountUserDTO.UserId.ToString())
 
-        }),
-            Expires = DateTime.UtcNow.AddYears(1),
+
+            }),
+            Expires = DateTime.UtcNow.AddDays(7),
             Issuer = issuer,
             Audience = audience,
             SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha512)

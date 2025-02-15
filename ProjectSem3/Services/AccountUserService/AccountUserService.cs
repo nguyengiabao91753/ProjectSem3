@@ -7,7 +7,7 @@ namespace ProjectSem3.Services.AccountService;
 public interface AccountUserService
 {
     public AccountUserDTO Login(string username, string password);
-    public string GenerateJSONWebToken(string username, int userId);
+    public string GenerateJSONWebToken(AccountUserDTO accountUserDTO);
     public AccountUserDTO GetInfoAccountById(int id);
     public List<AccountUserDTO> GetAllAccountUserInfo();
     public AccountUserDTO FindByUsername(string username);

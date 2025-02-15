@@ -364,7 +364,7 @@ public class AccountUserController : Controller
         var account = accountUserService.Login(accountUserDTO.Username, accountUserDTO.Password);
         if (account != null)
         {
-            var token = accountUserService.GenerateJSONWebToken(accountUserDTO.Username, account.UserId);
+            var token = accountUserService.GenerateJSONWebToken(account);
             return Ok(new
             {
                 token = token,
@@ -391,7 +391,7 @@ public class AccountUserController : Controller
         var accountUserDTO = await accountUserService.GetOrCreateUserFromGoogleAsync(payload);
 
         // Phát hành JWT token của server
-        var token = accountUserService.GenerateJSONWebToken(accountUserDTO.Username, accountUserDTO.UserId);
+        var token = accountUserService.GenerateJSONWebToken(accountUserDTO);
         return Ok(new
         {
             token = token,
