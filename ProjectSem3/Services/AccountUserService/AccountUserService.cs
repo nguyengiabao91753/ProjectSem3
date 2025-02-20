@@ -17,6 +17,8 @@ public interface AccountUserService
     public bool UpdateAccountUser(AccountUserDTO accountUserDTO);
     public bool UpdateUserProfile(AccountUserDTO accountUserDTO);
 
+    public bool UpdatePassword(AccountUserDTO accountUserDTO);
+
     public bool DeleteAccountUser(int id);
     public bool InActiveAccount(AccountUserDTO accountUserDTO);
     public bool ActiveAccount(AccountUserDTO accountUserDTO);

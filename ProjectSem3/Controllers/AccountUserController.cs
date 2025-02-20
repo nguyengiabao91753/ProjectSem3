@@ -138,7 +138,33 @@ public class AccountUserController : Controller
             return StatusCode(500, new { error = "Error during update", details = ex.Message });
         }
     }
-    
+
+    [Consumes("application/json")]
+    [Produces("application/json")]
+    [HttpPut("updatePassword")]
+    public IActionResult UpdatePassword([FromBody] AccountUserDTO accountUserDTO)
+    {
+        try
+        {
+            // Gọi đến service để cập nhật dữ liệu
+            bool result = accountUserService.UpdatePassword(accountUserDTO);
+
+            if (result)
+            {
+                return Ok(new { status = "Password updated successfully" });
+            }
+            else
+            {
+                return BadRequest(new { error = "Error during account update" });
+            }
+        }
+        catch (Exception ex)
+        {
+            // Xử lý ngoại lệ và trả về lỗi
+            return StatusCode(500, new { error = "Error during update", details = ex.Message });
+        }
+    }
+
     [HttpPut("updateAccountUserToken")]
     [Authorize]
     public IActionResult UpdateAccountUserToken([FromBody] AccountUserDTO accountUserDTO)

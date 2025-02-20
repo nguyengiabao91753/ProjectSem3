@@ -15,6 +15,13 @@ public class BusesSeatServiceImpl : BusesSeatService
         mapper = _mapper;
     }
 
+    public int CountSeatRemain(int busId)
+    {
+       var busSeat = GetSeatsByBusId(busId);
+
+        return busSeat.Count(b => b.Status == 1);
+    }
+
     public bool Create(BusesSeat busesSeat)
     {
         try

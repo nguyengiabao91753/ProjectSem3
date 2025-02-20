@@ -81,6 +81,23 @@ public class BusesSeatController : ControllerBase
         }
     }
 
+
+    [Consumes("application/json")]
+    [Produces("application/json")]
+    [HttpGet("count-seat-remaining")]
+    public IActionResult CountSeatReamaining(int id)
+    {
+        try
+        {
+            int result = busesSeatService.CountSeatRemain(id);
+            return Ok(result);
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(ex.Message);
+        }
+    }
+
     [Consumes("application/json")]
     [Produces("application/json")]
     [HttpPost("disable-buses-seat")]

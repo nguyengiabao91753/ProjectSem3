@@ -7,6 +7,8 @@ public interface BusesSeatService
 {
     public List<BusesSeatDTO> GetAll();
     public List<BusesSeatDTO> GetSeatsByBusId(int busId);
+
+    public int CountSeatRemain(int busId);
     public bool Create(BusesSeat busesSeat);
     public bool Update(BusesSeatDTO busesSeatDTO);
     public bool Disable(int id);

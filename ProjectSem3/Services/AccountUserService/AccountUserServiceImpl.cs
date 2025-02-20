@@ -449,4 +449,40 @@ public class AccountUserServiceImpl(DatabaseContext db, IMapper mapper, IConfigu
         return accountUserDTO;
     }
 
+    public bool UpdatePassword(AccountUserDTO accountUserDTO)
+    {
+        try
+        {
+            // Tìm Account và User bằng UserId
+            var currentAccount = db.Accounts.FirstOrDefault(a => a.AccountId == accountUserDTO.UserId);
+           
+
+            // Kiểm tra xem cả Account và User có tồn tại không
+            if (currentAccount == null)
+            {
+                return false;
+            }
+
+            // Cập nhật thông tin tài khoản (Account)
+            currentAccount.Username = accountUserDTO.Username;
+            currentAccount.Status = accountUserDTO.Status;
+            currentAccount.LevelId = accountUserDTO.LevelId;
+
+            if (!string.IsNullOrEmpty(accountUserDTO.Password))
+            {
+                currentAccount.Password = BCrypt.Net.BCrypt.HashPassword(accountUserDTO.Password);
+            }
+
+           
+
+            db.Entry(currentAccount).State = EntityState.Modified;
+
+            return db.SaveChanges() > 0;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error during update: {ex.Message}");
+            return false;
+        }
+    }
 }
