@@ -132,6 +132,11 @@ builder.Services.AddQuartz(q =>
     q.AddJob<TripSeatStatusJob>(opts => opts.WithIdentity(jobKey));
 
     q.AddTrigger(opts => opts
+       .ForJob(jobKey)
+       .WithIdentity("TripSeatStatusTrigger")
+       .StartNow() // Chạy ngay lập tức khi ứng dụng khởi động
+   );
+    q.AddTrigger(opts => opts
         .ForJob(jobKey)
         .WithIdentity("TripSeatStatusTrigger")
         .WithCronSchedule("0 0 * * * ?")); // Chạy mỗi giờ

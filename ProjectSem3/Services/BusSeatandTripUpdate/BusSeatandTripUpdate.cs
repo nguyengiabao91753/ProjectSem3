@@ -46,6 +46,7 @@ public class BusSeatandTripUpdate : BackgroundService
         foreach (var trip in trips)
         {
             trip.Status = 2;
+            
         }
 
         foreach (var busTrip in tripsToUpdate)
@@ -53,7 +54,8 @@ public class BusSeatandTripUpdate : BackgroundService
             busTrip.Trip.Status = 2;
 
             busTrip.Status = 2;
-
+            var bus = dbContext.Buses.SingleOrDefault(b => b.BusId == busTrip.BusId);
+            bus.Status = 1;
             var busSeats = dbContext.BusesSeats.Where(bs => bs.BusId == busTrip.BusId).ToList();
             foreach (var seat in busSeats)
             {
