@@ -6,6 +6,7 @@ public interface BusTypeService
 {
     public List<BusTypeDTO> GetAll();
 
+    public BusTypeDTO FindByName(string name);
     public bool Create(BusTypeDTO busTypeDTO);
     public bool Update(BusTypeDTO busTypeDTO);
     public bool Disable(int id);

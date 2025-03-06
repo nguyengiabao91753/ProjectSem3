@@ -28,6 +28,30 @@ public class BusTypeController : ControllerBase
         }
     }
 
+    [HttpGet("check-bus-type-name-exist/{name}")]
+    public IActionResult CheckBusTypeNameExist(string name)
+    {
+        try
+        {
+            var result = busTypeService.FindByName(name);
+            if (result != null) {
+
+                return Ok(new
+                {
+                    exist = true
+                });
+            }
+            return Ok(new
+            {
+                exist = false
+            });
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(ex.Message);
+        }
+    }
+
     [Consumes("application/json")]
     [Produces("application/json")]
     [HttpPost("create-bus-type")]

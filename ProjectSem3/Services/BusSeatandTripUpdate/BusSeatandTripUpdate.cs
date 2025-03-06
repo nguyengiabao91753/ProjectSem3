@@ -34,6 +34,7 @@ public class BusSeatandTripUpdate : BackgroundService
 
     public async Task UpdateTripAndSeatsStatus(DatabaseContext dbContext)
     {
+        
         var currentTime = DateTime.Now;
 
         var tripsToUpdate = dbContext.BusesTrips

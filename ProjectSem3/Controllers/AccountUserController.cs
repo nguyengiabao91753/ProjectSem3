@@ -359,7 +359,23 @@ public class AccountUserController : Controller
         if (existingAccount != null)
         {
             // Username đã tồn tại
-            return Ok(new { status = "Username already exists" });
+            return Ok(new { exists = "Username already exists" });
+        }
+
+        // Username chưa tồn tại
+        return Ok(new { exists = false });
+    }
+
+    [HttpGet("checkEmail/{email}")]
+    public IActionResult CheckEmail(string email)
+    {
+        // Kiểm tra xem email đã tồn tại chưa
+        var existingAccount = accountUserService.FindByEmail(email);
+
+        if (existingAccount != null)
+        {
+            // email đã tồn tại
+            return Ok(new { exists = "Email already exists" });
         }
 
         // Username chưa tồn tại

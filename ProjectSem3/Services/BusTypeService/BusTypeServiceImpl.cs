@@ -41,6 +41,18 @@ public class BusTypeServiceImpl : BusTypeService
         return Update(busTypeDTO);
     }
 
+    public BusTypeDTO FindByName(string name)
+    {
+        try
+        {
+            return mapper.Map<BusTypeDTO>(db.BusTypes.FirstOrDefault(b=>b.Name.ToUpper().Equals(name.ToUpper())));
+        }
+        catch (Exception ex)
+        {
+            return null;
+        }
+    }
+
     public List<BusTypeDTO> GetAll()
     {
         return mapper.Map<List<BusTypeDTO>>(db.BusTypes.ToList());
