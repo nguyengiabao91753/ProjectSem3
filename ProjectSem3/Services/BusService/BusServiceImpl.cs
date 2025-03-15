@@ -92,6 +92,7 @@ public class BusServiceImpl : BusService
 
                 bus.BusTypeId = busType.BusTypeId;
             }
+            bus.LocationId = busDTO.LocationId;
             db.Entry(bus).State = Microsoft.EntityFrameworkCore.EntityState.Modified;
             return db.SaveChanges() > 0;
         }
