@@ -18,11 +18,13 @@ public class BusesTripServiceImpl : BusesTripService
         try
         {
             var bt = mapper.Map<BusesTrip>(busesTripDTO);
+            
             db.BusesTrips.Add(bt);
             var bus =db.Buses.Find(bt.BusId);
             if (bus != null)
             {
                 bus.Status = 2;
+                bus.LocationId = bt.Trip.ArrivalLocationId;
                 db.Update(bus);
             }
             return db.SaveChanges() > 0;

@@ -1,4 +1,7 @@
-﻿namespace ProjectSem3.Models;
+﻿using System;
+using System.Collections.Generic;
+
+namespace ProjectSem3.Models;
 
 public partial class BookingDetail
 {
@@ -10,7 +13,7 @@ public partial class BookingDetail
 
     public string? SeatName { get; set; }
 
-    public int? AgeGroupId { get; set; }
+    public int AgeGroupId { get; set; }
 
     public decimal PriceAfterDiscount { get; set; }
 

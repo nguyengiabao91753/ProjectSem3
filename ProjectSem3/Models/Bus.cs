@@ -19,9 +19,13 @@ public partial class Bus
 
     public byte? Status { get; set; }
 
+    public int? LocationId { get; set; }
+
     public virtual BusType? BusType { get; set; }
 
     public virtual ICollection<BusesSeat> BusesSeats { get; set; } = new List<BusesSeat>();
 
     public virtual ICollection<BusesTrip> BusesTrips { get; set; } = new List<BusesTrip>();
+
+    public virtual Location? Location { get; set; }
 }

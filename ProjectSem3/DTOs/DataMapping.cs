@@ -63,7 +63,10 @@ public class DataMapping : Profile
         .ForMember(
             d => d.BusName,
             o => o.MapFrom(s => s.BusType.Name)
-        );
+        ).ForMember(
+            d => d.LocationName,
+            s => s.MapFrom(s => s.Location.Name)
+            );
         CreateMap<BusDTO, Bus>();
 
         CreateMap<BusesSeat, BusesSeatDTO>()

@@ -1,4 +1,7 @@
-﻿namespace ProjectSem3.Models;
+﻿using System;
+using System.Collections.Generic;
+
+namespace ProjectSem3.Models;
 
 public partial class Payment
 {
