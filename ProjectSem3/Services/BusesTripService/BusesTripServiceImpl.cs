@@ -24,10 +24,16 @@ public class BusesTripServiceImpl : BusesTripService
             if (bus != null)
             {
                 bus.Status = 2;
-                bus.LocationId = bt.Trip.ArrivalLocationId;
+                var trip = db.Trips.SingleOrDefault(t => t.TripId == bt.TripId);
+                if (trip != null)
+                {
+
+                bus.LocationId = trip.ArrivalLocationId;
+                }
                 db.Update(bus);
             }
             return db.SaveChanges() > 0;
+            
 
         }catch (Exception ex)
         {
