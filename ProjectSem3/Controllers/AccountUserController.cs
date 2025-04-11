@@ -1,8 +1,18 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authentication.Google;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using ProjectSem3.DTOs;
 using ProjectSem3.Services.AccountService;
 using System.Security.Claims;
+using Microsoft.EntityFrameworkCore;
+using ProjectSem3.Models;
+using PayPal;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Google.Apis.Auth;
+using System.Threading.Tasks;
+using static QRCoder.PayloadGenerator;
+using Newtonsoft.Json.Linq;
 
 namespace ProjectSem3.Controllers;
 [Route("api/accountUser")]
@@ -420,29 +430,29 @@ public class AccountUserController : Controller
     }
 
 
-    [HttpPost("loginWithGoogle")]
-    public async Task<IActionResult> LoginWithGoogle([FromBody] GoogleLoginDTO googleLoginDTO)
-    {
-        var payload = await accountUserService.VerifyGoogleToken(googleLoginDTO.IdToken);
-        if (payload == null)
-        {
-            return Unauthorized(new { message = "Invalid Google token" });
-        }
+    //[HttpPost("loginWithGoogle")]
+    //public async Task<IActionResult> LoginWithGoogle([FromBody] GoogleLoginDTO googleLoginDTO)
+    //{
+    //    var payload = await accountUserService.VerifyGoogleToken(googleLoginDTO.IdToken);
+    //    if (payload == null)
+    //    {
+    //        return Unauthorized(new { message = "Invalid Google token" });
+    //    }
 
-        // Tạo hoặc lấy thông tin người dùng từ database
-        var accountUserDTO = await accountUserService.GetOrCreateUserFromGoogleAsync(payload);
+    //    // Tạo hoặc lấy thông tin người dùng từ database
+    //    var accountUserDTO = await accountUserService.GetOrCreateUserFromGoogleAsync(payload);
 
-        // Phát hành JWT token của server
-        var token = accountUserService.GenerateJSONWebToken(accountUserDTO);
-        return Ok(new
-        {
-            token = token,
-            userId = accountUserDTO.UserId,
-            email = accountUserDTO.Email,
-            levelId = accountUserDTO.LevelId,
-            status = accountUserDTO.Status
-        });
-    }
+    //    // Phát hành JWT token của server
+    //    var token = accountUserService.GenerateJSONWebToken(accountUserDTO);
+    //    return Ok(new
+    //    {
+    //        token = token,
+    //        userId = accountUserDTO.UserId,
+    //        email = accountUserDTO.Email,
+    //        levelId = accountUserDTO.LevelId,
+    //        status = accountUserDTO.Status
+    //    });
+    //}
     //        return Unauthorized(new { message = "Invalid Google Token" });
     //    }
     //    catch (Exception ex)
@@ -452,6 +462,67 @@ public class AccountUserController : Controller
     //}
 
 
+    [HttpPost("google-login")]
+    public async Task<IActionResult> GoogleLogin([FromBody] string credential)
+    {
+        try
+        {
+            var settings = new GoogleJsonWebSignature.ValidationSettings()
+            {
+                Audience = new List<string> { configuration.GetValue<string>("Google:ClientID") }
+            };
 
+            var payload = await GoogleJsonWebSignature.ValidateAsync(credential, settings);
+
+            var account = accountUserService.FindByEmail(payload.Email);
+
+
+            if (account == null)
+            {
+                // Tạo tài khoản mới
+                var user = new AccountUserDTO
+                {
+                    Username = payload.Email,
+                    Password = null,
+                    Status = 1,
+                    LevelId = 3,
+                    FullName = payload.Name,
+                    BirthDate = DateTime.Now.ToString(),
+                    Email = payload.Email,
+                    PhoneNumber = null,
+                    Address = null,
+                    CreatedAt = DateTime.Now.ToString()
+                };
+
+
+
+                var response = accountUserService.CreateAccountUser(user);
+                if(response)
+                {
+                    account = accountUserService.FindByEmail(user.Email);
+
+                }
+                else
+                {
+                    return BadRequest(new { message = "Login Google Fail"});
+
+                }
+            }
+            var token = accountUserService.GenerateJSONWebToken(account);
+            return Ok(new
+            {
+                token = token,
+                userId = account.UserId,
+                email = account.Email,
+                levelId = account.LevelId,
+                status = account.Status
+            });
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(new { message = "Login Google Fail", details = ex.Message });
+        }
+       
+    }
 
 }

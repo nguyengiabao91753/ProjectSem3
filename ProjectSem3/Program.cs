@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authentication.OAuth;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
@@ -27,6 +28,9 @@ using System.Text;
 var builder = WebApplication.CreateBuilder(args);
 // Read configuration file (appsettings.json)
 //builder.Configuration.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
+
+
+
 
 //AUTHORIZE HEADER
 builder.Services.AddSwaggerGen(c =>
@@ -64,7 +68,16 @@ builder.Services.AddSignalR(); // Thêm dịch vụ SignalR
 
 // Add services to the container.
 builder.Services.AddControllers();
-builder.Services.AddCors(); //cho phép bên ngoài gọi API
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAll", builder =>
+    {
+        builder.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader();
+    });
+});
+
+
+
 
 //JWT
 builder.Services.AddAuthentication(option =>
@@ -72,7 +85,8 @@ builder.Services.AddAuthentication(option =>
     option.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
     option.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
     option.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
-}).AddJwtBearer(option =>
+})
+.AddJwtBearer(option =>
 {
     option.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
     //option.TokenValidationParameters = new TokenValidationParameters
@@ -165,12 +179,10 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection(); // Tự động chuyển hướng sang HTTPS
 app.UseRouting(); // Cấu hình định tuyến
 
-app.UseCors(builder => builder
-                .AllowAnyHeader()
-                .AllowAnyMethod()
-                .SetIsOriginAllowed((host) => true)
-                .AllowCredentials()
-            );
+app.UseCors("AllowAll");
+
+
+
 
 app.UseAuthentication(); //kích hoạt midddlewarre xác thực . Ví dụ, nó có thể đảm nhận việc kiểm tra xem người dùng đã đăng nhập chưa trước khi truy cập vào một trang hoặc tài nguyên cụ thể.
 // Validate the token
