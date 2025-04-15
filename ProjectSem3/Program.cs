@@ -68,13 +68,7 @@ builder.Services.AddSignalR(); // Thêm dịch vụ SignalR
 
 // Add services to the container.
 builder.Services.AddControllers();
-builder.Services.AddCors(options =>
-{
-    options.AddPolicy("AllowAll", builder =>
-    {
-        builder.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader();
-    });
-});
+builder.Services.AddCors();
 
 
 
@@ -179,7 +173,12 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection(); // Tự động chuyển hướng sang HTTPS
 app.UseRouting(); // Cấu hình định tuyến
 
-app.UseCors("AllowAll");
+app.UseCors(builder => builder
+                .AllowAnyHeader()
+                .AllowAnyMethod()
+                .SetIsOriginAllowed((host) => true)
+                .AllowCredentials()
+            );
 
 
 
