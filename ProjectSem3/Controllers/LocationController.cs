@@ -50,8 +50,6 @@ public class LocationController : Controller
 
             return Ok(result);
 
-
-
             throw new Exception();
         }
         catch (Exception ex)

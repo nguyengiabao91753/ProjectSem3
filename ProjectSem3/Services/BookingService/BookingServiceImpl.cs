@@ -228,7 +228,6 @@ public class BookingServiceImpl : BookingService
         db.BookingDetails.Update(detail);
         return db.SaveChanges() > 0;
     }
-
     public List<BookingDTO> GetAllByEmail(string email)
     {
         return mapper.Map<List<BookingDTO>>(db.Bookings.Where(b => b.Email == email).OrderByDescending(b => b.BookingId).ToList());
