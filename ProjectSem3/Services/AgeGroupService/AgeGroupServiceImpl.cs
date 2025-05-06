@@ -35,8 +35,16 @@ public class AgeGroupServiceImpl : AgeGroupService
     {
         var age = db.AgeGroups.SingleOrDefault(a => a.AgeGroupId == id);
         age.Status = 0;
-        var agedto = mapper.Map<AgeGroupDTO>(age);
-        return Update(agedto);
+        db.Entry(age).State = Microsoft.EntityFrameworkCore.EntityState.Modified;
+        return db.SaveChanges() > 0;
+    }
+
+    public bool DeleteOnDatabase(int id)
+    {
+        var age = db.AgeGroups.SingleOrDefault(a => a.AgeGroupId == id);
+        age.Status = 0;
+        db.AgeGroups.Remove(age);
+        return db.SaveChanges() > 0;
     }
 
     public List<AgeGroupDTO> GetAll()

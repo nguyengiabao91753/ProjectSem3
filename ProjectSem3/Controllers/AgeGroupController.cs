@@ -87,12 +87,37 @@ public class AgeGroupController : Controller
 
     [Consumes("application/json")]
     [Produces("application/json")]
-    [HttpDelete("delete")]
+    [HttpPost("delete")]
     public IActionResult Delete(int id)
     {
         try
         {
             var result = ageGroupService.Delete(id);
+
+            return Ok(new
+            {
+                status = result
+            }
+             );
+
+
+
+            throw new Exception();
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(ex.Message);
+        }
+    }
+
+    [Consumes("application/json")]
+    [Produces("application/json")]
+    [HttpDelete("deleteOnDb")]
+    public IActionResult DeleteOnDatabase(int id)
+    {
+        try
+        {
+            var result = ageGroupService.DeleteOnDatabase(id);
 
             return Ok(new
             {

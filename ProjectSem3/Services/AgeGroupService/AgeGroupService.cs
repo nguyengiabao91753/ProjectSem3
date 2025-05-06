@@ -11,5 +11,7 @@ public interface AgeGroupService
     public bool Update(AgeGroupDTO ageGroupDTO);
 
     public bool Delete(int id);
-    
+
+    public bool DeleteOnDatabase(int id);
+
 }
