@@ -39,7 +39,7 @@ public class AgeGroupController : Controller
 
     [Consumes("application/json")]
     [Produces("application/json")]
-    [HttpPost("update")]
+    [HttpPut("update")]
     public IActionResult Update([FromBody] AgeGroupDTO ageGroupDTO)
     {
         try
@@ -87,7 +87,7 @@ public class AgeGroupController : Controller
 
     [Consumes("application/json")]
     [Produces("application/json")]
-    [HttpPost("delete")]
+    [HttpDelete("delete")]
     public IActionResult Delete(int id)
     {
         try
