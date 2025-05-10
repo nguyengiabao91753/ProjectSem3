@@ -180,10 +180,7 @@ public class AccountUserServiceImpl(DatabaseContext db, IMapper mapper, IConfigu
             currentAccount.Status = accountUserDTO.Status;
             currentAccount.LevelId = accountUserDTO.LevelId;
 
-            if (!string.IsNullOrEmpty(accountUserDTO.Password))
-            {
-                currentAccount.Password = BCrypt.Net.BCrypt.HashPassword(accountUserDTO.Password);
-            }
+            
 
             // Cập nhật thông tin người dùng (User)
             user.FullName = accountUserDTO.FullName;
