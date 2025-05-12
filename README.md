@@ -1,9 +1,9 @@
 
 ---
 
-# 📘 Hướng Dẫn Cài Đặt Backend - Dự Án ProjectSem3 (.NET Core)
+# 📘 Hướng Dẫn Cài Đặt Backend - Dự Án ViserBus (.NET Core)
 
-Tài liệu này cung cấp hướng dẫn chi tiết các bước để thiết lập và chạy phần backend của dự án **ProjectSem3** sử dụng ASP.NET Core và SQL Server.
+Tài liệu này cung cấp hướng dẫn chi tiết các bước để thiết lập và chạy phần backend của dự án **ViserBus** sử dụng ASP.NET Core và SQL Server.
 
 ---
 
